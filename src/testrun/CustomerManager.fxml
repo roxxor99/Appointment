@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="549.0" prefWidth="1214.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="testrun.CustomerManagerController">
+   <children>
+      <AnchorPane id="AnchorPane" layoutX="10.0" layoutY="10.0" prefHeight="523.0" prefWidth="394.0">
+         <children>
+            <Label fx:id="lblCustomerManager" prefHeight="27.0" prefWidth="201.0" text="Customer Manager">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblManageCustomer" layoutX="140.0" layoutY="67.0" text="Manage Customer Info">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <TextField fx:id="txtAddress2" layoutX="48.0" layoutY="191.0" prefHeight="30.0" prefWidth="325.0" promptText="Title" text="Address continued" />
+            <TextField fx:id="txtZip" layoutX="48.0" layoutY="304.0" prefHeight="30.0" prefWidth="325.0" promptText="Zip Code" />
+            <Button fx:id="butSave" layoutX="157.0" layoutY="389.0" mnemonicParsing="false" onAction="#saveAction" prefHeight="25.0" prefWidth="75.0" text="Save" />
+            <TextField fx:id="txtAddress1" layoutX="48.0" layoutY="154.0" prefHeight="30.0" prefWidth="325.0" promptText="Title" text="Address" />
+            <ComboBox fx:id="comboCountry" disable="true" layoutX="48.0" layoutY="232.0" onAction="#countryAction" prefHeight="30.0" prefWidth="325.0" promptText="Country" />
+            <TextField fx:id="txtPhone" layoutX="48.0" layoutY="340.0" prefHeight="30.0" prefWidth="325.0" promptText="Phone Number" />
+            <ComboBox fx:id="comboCity" disable="true" layoutX="48.0" layoutY="268.0" onAction="#cityAction" prefHeight="30.0" prefWidth="325.0" promptText="City" />
+            <TextField fx:id="txtCustomerName" layoutX="48.0" layoutY="118.0" prefHeight="30.0" prefWidth="325.0" promptText="Title" text="Customer Name" />
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="411.0" layoutY="5.0" prefHeight="544.0" prefWidth="814.0">
+         <children>
+            <Label fx:id="lblCurrentCustomers" layoutX="343.0" layoutY="76.0" text="Current Customers">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Button fx:id="butDelete" layoutX="427.0" layoutY="480.0" mnemonicParsing="false" onAction="#deleteAction" prefHeight="25.0" prefWidth="75.0" text="Delete" />
+            <Button fx:id="butBack" layoutX="707.0" layoutY="505.0" mnemonicParsing="false" onAction="#backAction" prefHeight="25.0" prefWidth="75.0" text="Back" />
+            <Button fx:id="butModify" layoutX="333.0" layoutY="480.0" mnemonicParsing="false" onAction="#modifyAction" prefHeight="25.0" prefWidth="75.0" text="Modify" />
+            <TableView fx:id="tableCurrentSchedule" layoutX="32.0" layoutY="103.0" prefHeight="364.0" prefWidth="750.0">
+               <columns>
+                  <TableColumn fx:id="columnAddressCurrentCustomers" prefWidth="110.0" />
+                  <TableColumn fx:id="columnDescriptionCurrentSchedule" prefWidth="110.0" />
+                  <TableColumn fx:id="columnAddress2CurrentCustomers" prefWidth="110.0" />
+                  <TableColumn fx:id="columnCountryCurrentCustomers" prefWidth="110.0" />
+                  <TableColumn fx:id="columnCityCurrentCustomers" prefWidth="110.0" />
+                  <TableColumn fx:id="columnZipCurrentCustomers" prefWidth="110.0" />
+                  <TableColumn fx:id="columnPhoneCurrentCustomers" prefWidth="110.0" />
+               </columns>
+            </TableView>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
