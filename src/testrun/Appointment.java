@@ -19,53 +19,37 @@ import javafx.collections.ObservableList;
  * @author Jed Gunderson
  */
 public class Appointment {
-    public Customer customer;
-    
-    private IntegerProperty appointmentId;
-    private StringProperty title;
-    private StringProperty contact;
-    private StringProperty description;
-    private StringProperty location;
-    private StringProperty url;
+    private StringProperty customerName = new SimpleStringProperty();
+    private IntegerProperty customerId = new SimpleIntegerProperty();
+    private IntegerProperty appointmentId  = new SimpleIntegerProperty();
+    private StringProperty title = new SimpleStringProperty();
+    private StringProperty contact = new SimpleStringProperty();
+    private StringProperty description = new SimpleStringProperty();
+    private StringProperty location = new SimpleStringProperty();
+    private StringProperty url = new SimpleStringProperty();
     private Timestamp startTime;
     private Timestamp endTime;
     private Date startDate;
     private Date endDate;
-    private StringProperty dateTxt;
-    private StringProperty startTxt;
-    private StringProperty endTxt;
+    private StringProperty dateTxt = new SimpleStringProperty();
+    private StringProperty startTxt = new SimpleStringProperty();
+    private StringProperty endTxt = new SimpleStringProperty();
 //    private LocalDateTime start = new LocalDateTime();
 //    private LocalDateTime end = new LocalDateTime();
 //    private Date date = new Date();
     
-    //something similar to this?.. querry db => SELECT * FROM appointment
-//    public static ObservableList <Appointment> allAppointments = FXCollections.observableArrayList();
-   
-    
     //Constructor
-    public Appointment(int appointmentId, String title, String contact, String description, String location,
-                       String url, LocalDateTime start, LocalDateTime end) {
-        this.appointmentId = new SimpleIntegerProperty(appointmentId);
-        this.title = new SimpleStringProperty(title);
-        this.contact = new SimpleStringProperty(contact);
-        this.description = new SimpleStringProperty(description);
-        this.location = new SimpleStringProperty(location);
-        this.url = new SimpleStringProperty(url);
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
-        this.dateTxt = new SimpleStringProperty(dateFormat.format(startDate));
-        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a z");
-        this.startTxt = new SimpleStringProperty(timeFormat.format(startDate));
-        this.endTxt = new SimpleStringProperty(timeFormat.format(endDate));
+    public Appointment() {
+        
     }
     
     //Getters
     public IntegerProperty getAppointmentId() {
         return this.appointmentId;
         // appointmentId = String query = "SELECT * FROM appointment WHERE appointmentId =" + appointmentId;
+    }
+    public IntegerProperty getCustomerId() {
+        return this.customerId;
     }
 
     public StringProperty getTitle() {
@@ -86,8 +70,8 @@ public class Appointment {
         return this.location;
     }
         
-    public Customer getCustomer() {
-        return this.customer;
+    public StringProperty getCustomerName() {
+        return this.customerName;
     }
     
     public StringProperty getUrl() {
@@ -131,6 +115,10 @@ public class Appointment {
         this.appointmentId.set(appointmentId);
     }
     
+    public void setCustomerId(int customerId) {
+        this.customerId.set(customerId);
+    }
+    
     public void setTitle(String title) {
         this.title.set(title);
     }
@@ -147,8 +135,8 @@ public class Appointment {
         this.location.set(location);
     }
     
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setCustomerName(String customerName) {
+        this.customerName.set(customerName);
     }
     
     public void setUrl(String url) {

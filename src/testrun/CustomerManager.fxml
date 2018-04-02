@@ -45,13 +45,13 @@
             <Button fx:id="butModify" layoutX="333.0" layoutY="480.0" mnemonicParsing="false" onAction="#modifyAction" prefHeight="25.0" prefWidth="75.0" text="Modify" />
             <TableView fx:id="tableCurrentSchedule" layoutX="32.0" layoutY="103.0" prefHeight="364.0" prefWidth="750.0">
                <columns>
-                  <TableColumn fx:id="columnAddressCurrentCustomers" prefWidth="110.0" />
-                  <TableColumn fx:id="columnDescriptionCurrentSchedule" prefWidth="110.0" />
-                  <TableColumn fx:id="columnAddress2CurrentCustomers" prefWidth="110.0" />
-                  <TableColumn fx:id="columnCountryCurrentCustomers" prefWidth="110.0" />
-                  <TableColumn fx:id="columnCityCurrentCustomers" prefWidth="110.0" />
-                  <TableColumn fx:id="columnZipCurrentCustomers" prefWidth="110.0" />
-                  <TableColumn fx:id="columnPhoneCurrentCustomers" prefWidth="110.0" />
+                  <TableColumn fx:id="columnAddressCurrentCustomers" prefWidth="110.0" text="Customer Name" />
+                  <TableColumn fx:id="columnDescriptionCurrentSchedule" prefWidth="110.0" text="Address" />
+                  <TableColumn fx:id="columnAddress2CurrentCustomers" prefWidth="110.0" text="Address con..." />
+                  <TableColumn fx:id="columnCountryCurrentCustomers" prefWidth="110.0" text="Country" />
+                  <TableColumn fx:id="columnCityCurrentCustomers" prefWidth="110.0" text="City" />
+                  <TableColumn fx:id="columnZipCurrentCustomers" prefWidth="110.0" text="Zip" />
+                  <TableColumn fx:id="columnPhoneCurrentCustomers" prefWidth="110.0" text="Phone Number" />
                </columns>
             </TableView>
          </children>

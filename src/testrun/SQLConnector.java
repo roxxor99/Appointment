@@ -18,14 +18,10 @@ import javafx.stage.Modality;
 
 public class SQLConnector {
 
-    private ResultSet results;
-//    private String HOST;
-//    private String USERNAME;
-//    private String PASSWORD;
+    //private ResultSet rs;
     private static Connection con = null;
 
-    //DataBase Connection info
-    //needs to be changed to private and also different method name
+    //This is the DataBase Connection info
     private static void queryDatabase() throws SQLException {
         String host = "jdbc:mysql://52.206.157.109/U04E2d";
         String username = "U04E2d";
@@ -33,11 +29,23 @@ public class SQLConnector {
         con = DriverManager.getConnection(host, username, password);
 
     }
-
+    //TRYING TO SIMPLIFY moved here from SQLConnectorLogin
+//    public static Boolean loginUser(String username, String password) throws SQLException, IOException {
+//        Boolean userMatch = false;
+//        String sqlQuery = String.format("SELECT COUNT(userName) FROM user WHERE userName = '%s' AND password = '%s'", username, password);
+//        ResultSet queryResult = executeQuery(sqlQuery);
+//        //Check first obj in collection
+//        if (queryResult.first()) {
+//            //if match == 1 else != 0
+//            userMatch = queryResult.getInt(1) == 1;
+//        }
+//        return userMatch;
+//    }
+    
+    
     //Execute SQL query and return info
-    //need to add the dispose of DB connection and a try catch
     public static ResultSet executeQuery(String query) throws SQLException, IOException {
-        //anywhere reused will have to check for null
+        //!!!anywhere else that this is reused will have to check for null
         ResultSet rs = null;
         try {
             queryDatabase();
