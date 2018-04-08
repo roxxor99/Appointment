@@ -2,6 +2,7 @@ package testrun;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -24,6 +25,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import static testrun.MainLandingController.apptList;
 
 
 /**
@@ -32,9 +34,7 @@ import javafx.stage.Stage;
  * @author Jed Gunderson
  */
 //public class AppointmentManagerController implements Initializable {
-    //might need for modify appointment action
-//    public static Appointment selectedAppointment;
-//    public static Appointment getLocation;
+
  public class AppointmentManagerController{   
     @FXML
     private Label lblAppointmentManager;
@@ -57,7 +57,7 @@ import javafx.stage.Stage;
     @FXML
     private ComboBox<?> comboStartHour;
     @FXML
-    private ComboBox<?> comboStartMinute;
+    private ComboBox<String> comboStartMinute;
     @FXML
     private Label lblEndTime;
     @FXML
@@ -86,8 +86,8 @@ import javafx.stage.Stage;
     private TableColumn<Appointment, String> columnTitleCurrentSchedule;
     @FXML
     private TableColumn<Appointment, String> columnLocationCurrentSchedule;
-    @FXML
-    private TableColumn<Appointment, String> columnDateCurrentSchedule;
+//    @FXML
+//    private TableColumn<Appointment, String> columnDateCurrentSchedule;
     @FXML
     private TableColumn<Appointment, String> columnStartCurrentSchedule;
     @FXML
@@ -97,16 +97,17 @@ import javafx.stage.Stage;
      * Initializes the controller class.
      */
 //    @Override
-    public void initialize() {
+    public void initialize() throws SQLException, IOException {
         // Assign data to columns in =>tableCurrentSchedule
         columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
-        columnDescriptionCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getDescription());
+        columnDescriptionCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
         columnTitleCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getTitle());
         columnLocationCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getLocation());
-        //may need to make changes to appointment class so it is the same as .startTxtValue()
-        columnDateCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getDateTxt());
-        columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().startTxtValue());
-        columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTxt());
+        columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
+        columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
+        apptList = SQLConnectorData.databaseAppointments();
+        tableCurrentSchedule.setItems(MainLandingController.getApptList());
+        
     }              
         
 
@@ -124,6 +125,10 @@ import javafx.stage.Stage;
     
     @FXML
     private void startMinuteAction(ActionEvent event) {
+//        String[] startMinutes = {"00", "15", "30", "45"};
+//        ComboBox startMinuteList = new ComboBox(startMinutes);
+//        
+//        startMinutes.addActionListener(this);
     }
     
     @FXML
@@ -181,7 +186,7 @@ import javafx.stage.Stage;
     
     @FXML
     private void modifyAction(ActionEvent event) {
-    //Appointment selection required=> not sure about this yet...
+    //Appointment selection required to be modified or deleted
     //Appointment.selectedAppointment = tableCurrentSchedule.getSelectionModel().getSelectedItem();
 
 

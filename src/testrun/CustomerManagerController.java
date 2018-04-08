@@ -2,8 +2,10 @@ package testrun;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,7 +27,7 @@ import javafx.stage.Stage;
  *
  * @author Jed Gunderson
  */
-public class CustomerManagerController implements Initializable {
+public class CustomerManagerController {
 
     @FXML
     private Label lblCustomerManager;
@@ -56,29 +58,39 @@ public class CustomerManagerController implements Initializable {
     @FXML
     private Button butModify;
     @FXML
-    private TableView<?> tableCurrentSchedule;
+    private TableView<Customer> tableCurrentSchedule;
     @FXML
-    private TableColumn<?, ?> columnAddressCurrentCustomers;
+    private TableColumn<Customer, String> columnAddressCurrentCustomers;
     @FXML
-    private TableColumn<?, ?> columnDescriptionCurrentSchedule;
+    private TableColumn<Customer, String> columnDescriptionCurrentSchedule;
     @FXML
-    private TableColumn<?, ?> columnAddress2CurrentCustomers;
+    private TableColumn<Customer, String> columnAddress2CurrentCustomers;
     @FXML
-    private TableColumn<?, ?> columnCountryCurrentCustomers;
+    private TableColumn<Customer, String> columnCountryCurrentCustomers;
     @FXML
-    private TableColumn<?, ?> columnCityCurrentCustomers;
+    private TableColumn<Customer, String> columnCityCurrentCustomers;
     @FXML
-    private TableColumn<?, ?> columnZipCurrentCustomers;
+    private TableColumn<Customer, String> columnZipCurrentCustomers;
     @FXML
-    private TableColumn<?, ?> columnPhoneCurrentCustomers;
+    private TableColumn<Customer, String> columnPhoneCurrentCustomers;
+    //static ObservableList<Customer> customerList;
 
     /**
      * Initializes the controller class.
      */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    //@Override
+    public void initialize() throws SQLException, IOException {
+        // Assign data to columns in =>tableCurrentSchedule
+        columnAddressCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
+        columnDescriptionCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getAddress());
+        //columnAddress2CurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getAddress2());
+        columnCityCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCity());
+        columnCountryCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCountry());
+        columnZipCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getPostalCode());
+        columnPhoneCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getPhone());
+
+        tableCurrentSchedule.setItems(SQLConnectorData.databaseCustomer());
+    }
 
     @FXML
     private void saveAction(ActionEvent event) {
@@ -94,11 +106,20 @@ public class CustomerManagerController implements Initializable {
 
     @FXML
     private void deleteAction(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText("Confirmation Delete Dialog");
+        alert.setContentText("Are you sure you want to delete the selected record?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            //This will be different... needs to delete from database not from the display table
+            //customerList.remove(tableCurrentSchedule.getSelectionModel().getSelectedItem());
+        }
     }
 
     @FXML
     private void backAction(ActionEvent event) throws IOException {
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation");
         alert.setHeaderText("Confirm Back");
         alert.setContentText("Are you sure you would like to go back? Any un-saved work will be lost.");
@@ -118,5 +139,9 @@ public class CustomerManagerController implements Initializable {
     @FXML
     private void modifyAction(ActionEvent event) {
     }
+
+//    public static ObservableList<Customer> getCustList() {
+//        return customerList;
+//    }
     
 }

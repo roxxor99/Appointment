@@ -2,10 +2,8 @@ package testrun;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
-import javafx.collections.transformation.FilteredList;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,9 +27,6 @@ import javafx.stage.Stage;
  */
 //public class MainLandingController implements Initializable {
 public class MainLandingController {
-    public Customer customer;
-    public Appointment appointment;
-    
     @FXML
     private RadioButton radioMonthyView;
     @FXML
@@ -48,8 +43,8 @@ public class MainLandingController {
     private TableColumn<Appointment, String> columnTitleCurrentSchedule;
     @FXML
     private TableColumn<Appointment, String> columnLocationCurrentSchedule;
-    @FXML
-    private TableColumn<Appointment, String> columnDateCurrentSchedule;
+//    @FXML
+//    private TableColumn<Appointment, String> columnDateCurrentSchedule;
     @FXML
     private TableColumn<Appointment, String> columnStartCurrentSchedule;
     @FXML
@@ -64,42 +59,41 @@ public class MainLandingController {
     private Label lblCurrentSchedule;
     @FXML
     private Button butExit;
+    static ObservableList<Appointment> apptList;
+    private boolean isMonth;
     
     /**
      * Initializes the controller class.
      */
     //@Override
     public void initialize() throws SQLException, IOException {
-        //SQLConnectorCustomerAppointments.databaseAppointments();
-        //tableMainCurrentSchedule = new TableView<Appointment>(SQLConnectorCustomerAppointments.databaseAppointments());      
-        
         // Assign data to columns in =>tableMainCurrentSchedule
         columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
-        columnDescriptionCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getDescription());
+        columnDescriptionCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
         columnTitleCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getTitle());
         columnLocationCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getLocation());
-        //Not needed
-        //columnDateCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getDateTxt());
-                
-        //May need to make changes in appointment class under .startTxtValue()
-        //columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
-        //columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime().toLocalDateTime());
-        //columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime().toString());
-        tableMainCurrentSchedule.setItems(SQLConnectorCustomerAppointments.databaseAppointments());
+        columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
+        columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
+        apptList = SQLConnectorData.databaseAppointments();
+        tableMainCurrentSchedule.setItems(apptList);
     }
+//    private void populateAptTable(){
+//        
+//    }
+    
     
     //Calendar by month radio
     @FXML
     private void monthlyViewAction(ActionEvent event) {
         //something like this?
-//        isMonth = true;
+        isMonth = true;
 //        handleAppointmentView();
     }
     
     //Calendar by week radio
     @FXML
     private void weeklyViewAction(ActionEvent event) {
-//        isMonth = false;
+        isMonth = false;
 //        handleAppointmentView();
         
     }
@@ -181,15 +175,19 @@ public class MainLandingController {
             System.exit(0);
         }
     }
+
+    public static ObservableList<Appointment> getApptList() {
+        return apptList;
+    }
     
 }
 
 
 // Moves calendar to current date
 //    @FXML
-//    private void goToCurrentDate(ActionEvent event) {
+//    private void goToCurrentDate(boolean isMonthView) {
 //        // Check if calendar is currently in monthly view
-//        if (monthlyView) {
+//        if (isMonthView) {
 //            // Remove current calendarView
 //            mainScreenGrid.getChildren().remove(monthlyCalendarView);
 //            // Get current year-month
