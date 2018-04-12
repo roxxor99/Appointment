@@ -76,6 +76,8 @@ public class AppointmentManagerController {
     @FXML
     private TextField txtCreatedBy;
     @FXML
+    private ComboBox<String> comboType;
+    @FXML
     private ComboBox<String> comboStartHour;
     @FXML
     private ComboBox<String> comboStartMinute;
@@ -115,17 +117,8 @@ public class AppointmentManagerController {
         columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
         columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
         
-        //apptList = SQLConnectorData.databaseAppointments();//do not need to query again
-        //tableCurrentSchedule.setItems(MainLandingController.getApptList());//updated to variable apptList().
         apptList = MainLandingController.getApptList();
         tableCurrentSchedule.setItems(apptList);
-        
-        
-         
-         //StartMinutes
-//         comboStartMinute = new ComboBox<>();
-//         comboStartMinute.getItems().addAll("00","15","30","45",);
-        
     }
 
     @FXML
@@ -133,26 +126,33 @@ public class AppointmentManagerController {
     }
 
     @FXML
-    private void descriptionAction(ActionEvent event) {
+    private void typeAction(ActionEvent event) {
     }
     
     @FXML
     private void locationAction(ActionEvent event) {
+//         comboLocation = new ComboBox<>();
+//         comboLocation.getItems().addAll("New York","Phoenix","London");
     }
     
     @FXML
     private void startHourAction(ActionEvent event) {
-        }
-    
-     public void comboStartHour() {
          //24 hour format 9am - 4pm
-         comboStartHour = new ComboBox<>();
+//         comboStartHour = new ComboBox<>();
          //create the combobox
-         comboStartHour.getItems().addAll("09","10","11","12","13","14","15","16");
+//         comboStartHour.getItems().addAll("09","10","11","12","13","14","15","16");
     }
+    
     
     @FXML
     private void startMinuteAction(ActionEvent event) {
+
+         //StartMinutes
+//         comboStartMinute = new ComboBox<>();
+//         comboStartMinute.getItems().addAll("00","15","30","45",);
+
+
+
 //        String[] startMinutes = {"00", "15", "30", "45"};
 //        ComboBox startMinuteList = new ComboBox(startMinutes);
 //        
@@ -170,7 +170,7 @@ public class AppointmentManagerController {
     @FXML
     private void saveAction(ActionEvent event) {
         String customerName = comboCustomerName.getSelectionModel().getSelectedItem();
-        String type = txtType.getText();
+        String type = comboType.getSelectionModel().getSelectedItem();
         String createdBy = txtCreatedBy.getText();
         String location = comboLocation.getSelectionModel().getSelectedItem();
         LocalDate date = datePicker.getValue();
@@ -187,7 +187,7 @@ public class AppointmentManagerController {
             mainScreenStage.show();
 
             String sqlAppointmentInsert = "INSERT INTO Appointment (customerId, title, description, location, contact, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy)" //insert all fields except appointmentId match name to db fields
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), ?, now(), ?)";//use empty "" for fields not being used?. use now() for update and created
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, now(), ?, now(), ?)";
             
             PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAppointmentInsert);
             statement.setString(1, customerName);
@@ -245,13 +245,10 @@ public class AppointmentManagerController {
         }
     }
 
-    
     @FXML
         private void modifyAction(ActionEvent event) {
             //Appointment selection required to be modified or deleted
     //Appointment.selectedAppointment = tableCurrentSchedule.getSelectionModel().getSelectedItem();
-
-
     }
-    
-    }
+        
+}

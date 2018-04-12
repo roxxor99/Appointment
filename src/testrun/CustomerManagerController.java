@@ -3,11 +3,14 @@ package testrun;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,6 +28,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import static testrun.SQLConnector.executeQuery;
 
 /**
@@ -39,19 +43,17 @@ public class CustomerManagerController {
     @FXML
     private Label lblManageCustomer;
     @FXML
-    private TextField txtAddress2;
-    @FXML
     private TextField txtZip;
     @FXML
     private Button butSave;
     @FXML
-    private TextField txtAddress1;
+    private TextField txtAddress;
     @FXML
-    private ComboBox<?> comboCountry;
+    private TextField txtCountry;
+    @FXML
+    private TextField txtCity;
     @FXML
     private TextField txtPhone;
-    @FXML
-    private ComboBox<?> comboCity;
     @FXML
     private TextField txtCustomerName;
     @FXML
@@ -68,8 +70,6 @@ public class CustomerManagerController {
     private TableColumn<Customer, String> columnAddressCurrentCustomers;
     @FXML
     private TableColumn<Customer, String> columnDescriptionCurrentSchedule;
-    @FXML
-    private TableColumn<Customer, String> columnAddress2CurrentCustomers;
     @FXML
     private TableColumn<Customer, String> columnCountryCurrentCustomers;
     @FXML
@@ -100,9 +100,9 @@ public class CustomerManagerController {
     @FXML
     private void saveAction(ActionEvent event) {
 //        String customerName = txtCustomerName.getText();
-//        String address = txtAddress1.getText();
-//        String country = comboCountry.getSelectionModel().getSelectedItem();
-//        String city = comboCity.getSelectionModel().getSelectedItem();
+//        String address = txtAddress.getText();
+//        String country = txtCountry.getText();
+//        String city = txtCity.getText();
 //        String postalCode = txtZip.getText();
 //        String phone = txtPhone.getText();
 //        
@@ -137,14 +137,7 @@ public class CustomerManagerController {
 //        }
         
     }
-        @FXML
-        private void countryAction(ActionEvent event) {
-    }
-
-    @FXML
-        private void cityAction(ActionEvent event) {
-    }
-
+    
     @FXML
         private void deleteAction (ActionEvent event) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -180,4 +173,47 @@ public class CustomerManagerController {
         @FXML
         private void modifyAction(ActionEvent event) {
     }
+        //Populate the Customer Combobox
+//        private void populateCustomer() throws SQLException {
+//        //get db connection
+//        PreparedStatement statement = SQLConnector.getCon().prepareStatement("SELECT customerId, customerName FROM customer ORDER BY customerName ASC;");
+//        
+//
+//        scheduler.prepStatement = scheduler.connection.prepareStatement("SELECT customerId, customerName FROM customer WHERE active = 1 ORDER BY customerName ASC;");
+//        System.out.println(scheduler.prepStatement.toString());
+//        
+//        ResultSet rs = scheduler.RUNMYSQL(scheduler.prepStatement, x -> scheduler.query(x));
+//        
+//        ObservableList<Customer> customers = FXCollections.observableArrayList();
+//        
+//        while(rs.next()) {
+//            customers.add(
+//                    new Customer(
+//                        rs.getInt("customerId"), 
+//                        rs.getString("customerName"), "", 1
+//                    )
+//            );
+//        }
+//        
+//        scheduler.prepStatement.close();
+//        rs.close();
+//        
+//        this.aptCustomer.setItems(customers);
+//        
+//        StringConverter<Customer> converter = new StringConverter<Customer>() {
+//            @Override
+//            public String toString(Customer customer) {
+//                return customer.nameProperty().get();
+//            }
+//            
+//            @Override
+//            public Customer fromString(String id) {
+//                return customers.stream()
+//                        .filter(item -> item.customerIDProperty().toString().equals(id))
+//                        .collect(Collectors.toList()).get(0);
+//            }
+//        };
+//        
+//        this.aptCustomer.setConverter(converter);
+//    }
 }

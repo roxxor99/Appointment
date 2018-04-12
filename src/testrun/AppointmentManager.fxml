@@ -25,9 +25,9 @@
                   <Font size="18.0" />
                </font>
             </Label>
-            <ComboBox fx:id="comboCustomerName" disable="true" layoutX="48.0" layoutY="117.0" onAction="#customerNameAction" prefHeight="30.0" prefWidth="325.0" promptText="Customer" />
-            <TextField fx:id="txtType" layoutX="48.0" layoutY="156.0" prefHeight="30.0" prefWidth="325.0" promptText="Type" />
-            <TextField fx:id="txtCreatedBy" layoutX="48.0" layoutY="192.0" prefHeight="30.0" prefWidth="325.0" promptText="Contact" />
+            <ComboBox fx:id="comboCustomerName" layoutX="49.0" layoutY="117.0" onAction="#customerNameAction" prefHeight="30.0" prefWidth="325.0" promptText="Customer" />
+            <ComboBox fx:id="comboType" layoutX="49.0" layoutY="155.0" onAction="#typeAction" prefHeight="30.0" prefWidth="325.0" promptText="Type" />
+            <TextField fx:id="txtCreatedBy" layoutX="49.0" layoutY="192.0" prefHeight="30.0" prefWidth="325.0" promptText="Contact" />
             <Label fx:id="lblStartTime" layoutX="50.0" layoutY="306.0" text="Start Time" />
             <Label fx:id="lblEndTime" layoutX="48.0" layoutY="363.0" text="End Time" />
             <ComboBox fx:id="comboStartHour" layoutX="50.0" layoutY="323.0" onAction="#startHourAction" prefHeight="30.0" prefWidth="75.0" promptText="Hour" />
@@ -35,7 +35,7 @@
             <ComboBox fx:id="comboEndHour" layoutX="50.0" layoutY="380.0" onAction="#endHourAction" prefHeight="30.0" prefWidth="75.0" promptText="Hour" />
             <ComboBox fx:id="comboEndMinute" layoutX="130.0" layoutY="380.0" onAction="#endMinuteAction" prefHeight="30.0" prefWidth="75.0" promptText="Min" />
               <Button fx:id="butSave" layoutX="157.0" layoutY="451.0" mnemonicParsing="false" onAction="#saveAction" prefHeight="25.0" prefWidth="75.0" text="Save" />
-            <ComboBox fx:id="comboLocation" disable="true" layoutX="49.0" layoutY="227.0" onAction="#locationAction" prefHeight="30.0" prefWidth="325.0" promptText="Location" />
+            <ComboBox fx:id="comboLocation" layoutX="49.0" layoutY="227.0" onAction="#locationAction" prefHeight="30.0" prefWidth="325.0" promptText="Location" />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="400.0" layoutY="5.0" prefHeight="523.0" prefWidth="825.0">
