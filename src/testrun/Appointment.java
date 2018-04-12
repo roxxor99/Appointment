@@ -23,6 +23,12 @@ public class Appointment {
     private StringProperty startTime = new SimpleStringProperty();
     private StringProperty endTime = new SimpleStringProperty();
     private StringProperty createdBy = new SimpleStringProperty();
+    
+    //I think I need these 3 in order to save to the database in AppointmentManagerController.java saveAction() method
+    private StringProperty createDate = new SimpleStringProperty();
+    private StringProperty lastUpdate = new SimpleStringProperty();
+    private StringProperty lastUpdateBy = new SimpleStringProperty();
+    
     private Date startDate;
     private Date endDate;
 //    private StringProperty dateTxt = new SimpleStringProperty();
@@ -87,7 +93,22 @@ public class Appointment {
         return this.createdBy;
 
     }
+    
+    public StringProperty createDate() {
+        return this.createDate;
 
+    }
+    
+    public StringProperty lastUpdate() {
+        return this.lastUpdate;
+
+    }
+    
+    public StringProperty lastUpdateBy() {
+        return this.lastUpdateBy;
+
+    }
+    
 //    public String getStartTxt() {
 //        return this.startTxt.get();
 //    }
@@ -152,6 +173,18 @@ public class Appointment {
     
     public void setCreatedBy(String createdBy) {
         this.createdBy.set(createdBy);
+    }
+    
+    public void setCreateDate(String createDate) {
+        this.createDate.set(createDate);
+    }
+    
+    public void setLastUpdate(String lastUpdate) {
+        this.lastUpdate.set(lastUpdate);
+    }
+    
+    public void setLastUpdateBy(String lastUpdateBy) {
+        this.lastUpdateBy.set(lastUpdateBy);
     }
     
 }

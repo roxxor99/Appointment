@@ -43,8 +43,8 @@
       <TableView fx:id="tableMainCurrentSchedule" layoutX="114.0" layoutY="67.0" prefHeight="364.0" prefWidth="750.0">
          <columns>
             <TableColumn fx:id="columnCustNameCurrentSchedule" prefWidth="125.0" text="Name" />
-            <TableColumn fx:id="columnDescriptionCurrentSchedule" prefWidth="125.0" text="User" />
-            <TableColumn fx:id="columnTitleCurrentSchedule" prefWidth="125.0" text="Type" />
+            <TableColumn fx:id="columnCreatedByCurrentSchedule" prefWidth="125.0" text="User" />
+            <TableColumn fx:id="columnTypeCurrentSchedule" prefWidth="125.0" text="Type" />
             <TableColumn fx:id="columnLocationCurrentSchedule" prefWidth="125.0" text="Location" />
             <TableColumn fx:id="columnStartCurrentSchedule" prefWidth="125.0" text="Start" />
             <TableColumn fx:id="columnEndCurrentSchedule" prefWidth="125.0" text="End" />

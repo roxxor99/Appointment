@@ -31,6 +31,12 @@ public class SQLConnectorData extends SQLConnector {
             appointment.setUrl(queryResult.getString("url"));
             appointment.setStartTime(queryResult.getString("start"));
             appointment.setEndTime(queryResult.getString("end"));
+            
+            //I think I need these 3 in order to save to the database in AppointmentManagerController.java saveAction() method
+            appointment.setCreateDate(queryResult.getString("createDate"));
+            appointment.setCreateDate(queryResult.getString("lastUpdate"));
+            appointment.setCreateDate(queryResult.getString("lastUpdateBy"));
+            
             appointmentList.add(appointment);
         }
 

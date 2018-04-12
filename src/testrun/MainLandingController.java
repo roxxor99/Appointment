@@ -1,9 +1,140 @@
+
+//    public void initialize() throws SQLException, IOException {
+//        apptList = SQLConnectorData.databaseAppointments();
+//        
+//    }
+//    private void populateAptTable(boolean isMonth) throws ParseException {
+//        // Assign data to columns in =>tableMainCurrentSchedule
+//        LocalDate now = LocalDate.now();
+//        ObservableList<Appointment> filteredList = FXCollections.observableArrayList();
+//        for (Appointment appointment:apptList)
+//        {
+//            Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2014-10-14 03:05:39");//(appointment.getStartTime().getValue());
+//            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+////            String utcTime = appointment.getStartTime().getValue();
+////            DateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+////            utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+////            Date utcDate = utcFormat.parse(utcTime);
+////            LocalDate dateParsed = LocalDate.parse(dateTimeFormatter.format((TemporalAccessor) utcDate), dateTimeFormatter);
+//            
+//            
+////            String check = appointment.getStartTime().getValue();
+////            LocalDate test = LocalDate.parse(check);
+////            String utcTime = appointment.getStartTime().getValue();
+////            DateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+////            utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//            
+////         String utcTimeString = "2014-10-14 03:05:39";
+////         DateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+////         utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+////         Date utcTime = utcFormat.parse(utcTimeString);
+////
+////
+////         DateFormat localFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+////         localFormat.setTimeZone(TimeZone.getDefault());
+////         System.out.println("Local: " + localFormat.format(utcTime));
+//         
+//            LocalDate currentApt = LocalDate.parse(appointment.getStartTime().toString());
+//            //LocalDate currentApt = LocalDate.parse(date);
+////            LocalDate.parse(dateTimeFormatter.format(date), dateTimeFormatter);
+//            if(isMonth) {
+//               if(currentApt.getMonth() == now.getMonth()){
+//                   filteredList.add(appointment);
+//               }
+//            }
+//            else{
+//                LocalDate week = now.plusDays(7);
+//                if(currentApt.isAfter(now) && currentApt.isBefore(week)) {
+//                    filteredList.add(appointment);
+//                }
+//            }
+//        }
+//        columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
+//        columnDescriptionCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
+//        columnTitleCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getTitle());
+//        columnLocationCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getLocation());
+//        columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
+//        columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
+//        tableMainCurrentSchedule.setItems(filteredList);
+//    }
+//
+//    
+//    //Calendar by month radio
+//    @FXML
+//    private void monthlyViewAction(ActionEvent event) throws ParseException {
+//        populateAptTable(true);
+//        
+//    }
+//    
+//    //Calendar by week radio
+//    @FXML
+//    private void weeklyViewAction(ActionEvent event) throws ParseException {
+//        populateAptTable(false);
+//        
+//    }
+//    
+//    @FXML
+//    private void manageCustomersAction(ActionEvent event) throws IOException {
+//    Stage stage;
+//        Parent root;
+//        stage = (Stage) butManageCustomers.getScene().getWindow();
+//        root = FXMLLoader.load(getClass().getResource("CustomerManager.fxml"));
+//        Scene scene = new Scene(root);
+//        stage.setScene(scene);
+//        stage.show();
+//    }
+//
+//    @FXML
+//    private void manageAppointmentsAction(ActionEvent event) throws IOException {
+//    Stage stage;
+//        Parent root;
+//        stage = (Stage) butManageAppointments.getScene().getWindow();
+//        root = FXMLLoader.load(getClass().getResource("AppointmentManager.fxml"));
+//        Scene scene = new Scene(root);
+//        stage.setScene(scene);
+//        stage.show();
+//    }
+//    
+//    @FXML
+//    private void manageReportsAction(ActionEvent event) throws IOException {
+//        Stage stage;
+//        Parent root;
+//        stage = (Stage) butManageReports.getScene().getWindow();
+//        root = FXMLLoader.load(getClass().getResource("ReportInfo.fxml"));
+//        Scene scene = new Scene(root);
+//        stage.setScene(scene);
+//        stage.show();
+//    }
+//    
+//    @FXML
+//    private void exitAction(ActionEvent event) {
+//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//        alert.initModality(Modality.NONE);
+//        alert.setTitle("Confirmation ");
+//        alert.setHeaderText("Confirm Exit");
+//        alert.setContentText("Are you sure you want to exit?");
+//        Optional<ButtonType> result = alert.showAndWait();
+//        if (result.get() == ButtonType.OK) {
+//            System.exit(0);
+//        }
+//    }
+//
+//    public static ObservableList<Appointment> getApptList() {
+//        return apptList;
+//    }
+//    
+//}
 package testrun;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,6 +158,7 @@ import javafx.stage.Stage;
  */
 //public class MainLandingController implements Initializable {
 public class MainLandingController {
+
     @FXML
     private RadioButton radioMonthyView;
     @FXML
@@ -38,13 +170,11 @@ public class MainLandingController {
     @FXML
     private TableColumn<Appointment, String> columnCustNameCurrentSchedule;
     @FXML
-    private TableColumn<Appointment, String> columnDescriptionCurrentSchedule;
+    private TableColumn<Appointment, String> columnCreatedByCurrentSchedule;
     @FXML
-    private TableColumn<Appointment, String> columnTitleCurrentSchedule;
+    private TableColumn<Appointment, String> columnTypeCurrentSchedule;
     @FXML
     private TableColumn<Appointment, String> columnLocationCurrentSchedule;
-//    @FXML
-//    private TableColumn<Appointment, String> columnDateCurrentSchedule;
     @FXML
     private TableColumn<Appointment, String> columnStartCurrentSchedule;
     @FXML
@@ -59,80 +189,63 @@ public class MainLandingController {
     private Label lblCurrentSchedule;
     @FXML
     private Button butExit;
-    static ObservableList<Appointment> apptList;
-    private boolean isMonth;
     
+    static ObservableList<Appointment> apptList;
+    
+    private boolean isMonth;
+
     /**
      * Initializes the controller class.
+     * @throws java.sql.SQLException
+     * @throws java.io.IOException
      */
     //@Override
     public void initialize() throws SQLException, IOException {
         // Assign data to columns in =>tableMainCurrentSchedule
         columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
-        columnDescriptionCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
-        columnTitleCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getTitle());
+        columnCreatedByCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
+        columnTypeCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getTitle());
         columnLocationCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getLocation());
         columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
         columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
         apptList = SQLConnectorData.databaseAppointments();
         tableMainCurrentSchedule.setItems(apptList);
     }
-//    private void populateAptTable(){
-//        
-//    }
-    
-    
+
     //Calendar by month radio
     @FXML
-    private void monthlyViewAction(ActionEvent event) {
-        //something like this?
-        isMonth = true;
-//        handleAppointmentView();
+    private void monthlyViewAction(ActionEvent event) throws ParseException {
+//        //populateAptTable(true);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime nowPlus1 = now.plusMonths(1);
+        FilteredList<Appointment> filteredData = new FilteredList<>(apptList);
+        //set predicate is a filter true or false
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        filteredData.setPredicate(row -> {
+            LocalDateTime rowDate = LocalDateTime.parse(row.getStartTime().getValue(), df);
+            return rowDate.isAfter(now) && rowDate.isBefore(nowPlus1);
+        });
+        //tableMainCurrentSchedule.getItems().clear();
+        tableMainCurrentSchedule.setItems(filteredData);
     }
-    
+
     //Calendar by week radio
     @FXML
     private void weeklyViewAction(ActionEvent event) {
-        isMonth = false;
-//        handleAppointmentView();
-        
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime nowPlus7 = now.plusDays(7);
+        FilteredList<Appointment> filteredData = new FilteredList<>(apptList);
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        filteredData.setPredicate(row -> {
+            LocalDateTime rowDate = LocalDateTime.parse(row.getStartTime().getValue(), df);
+            return rowDate.isAfter(now) && rowDate.isBefore(nowPlus7);
+        });
+        tableMainCurrentSchedule.setItems(filteredData);
     }
 
-        //Weekly tableview code?
-//        LocalDate now = LocalDate.now();
-//        LocalDate nowPlus7 = now.plusDays(7);
-//        FilteredList<Appointment> filteredData = new FilteredList<>(allAppointments);
-//        filteredData.setPredicate(row -> {
-//
-//            LocalDate rowDate = LocalDate.parse(row.getDate().getValue().toString());
-//
-//            return rowDate.isAfter(now) && rowDate.isBefore(nowPlus7);
-//        });
-//        tableCurrentSchedule.setItems(filteredData);
-    
-    
-    //need somthing for tableview switch might be better to use tab instead of radio buttons.
-//    private void handleAppointmentView() {
-//        Parent main = null;
-//        try {
-//            main = FXMLLoader.load(getClass().getResource(""));
-//            Scene scene = new Scene(main);
-//
-//            Stage stage = C195SceneChangeExample.getStage();
-//            
-//            stage.setScene(scene);
-//
-//            stage.show();
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
-    
-    
-    
-    
     @FXML
     private void manageCustomersAction(ActionEvent event) throws IOException {
-    Stage stage;
+        Stage stage;
         Parent root;
         stage = (Stage) butManageCustomers.getScene().getWindow();
         root = FXMLLoader.load(getClass().getResource("CustomerManager.fxml"));
@@ -143,7 +256,7 @@ public class MainLandingController {
 
     @FXML
     private void manageAppointmentsAction(ActionEvent event) throws IOException {
-    Stage stage;
+        Stage stage;
         Parent root;
         stage = (Stage) butManageAppointments.getScene().getWindow();
         root = FXMLLoader.load(getClass().getResource("AppointmentManager.fxml"));
@@ -151,7 +264,7 @@ public class MainLandingController {
         stage.setScene(scene);
         stage.show();
     }
-    
+
     @FXML
     private void manageReportsAction(ActionEvent event) throws IOException {
         Stage stage;
@@ -162,10 +275,10 @@ public class MainLandingController {
         stage.setScene(scene);
         stage.show();
     }
-    
+
     @FXML
     private void exitAction(ActionEvent event) {
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.initModality(Modality.NONE);
         alert.setTitle("Confirmation ");
         alert.setHeaderText("Confirm Exit");
@@ -179,73 +292,9 @@ public class MainLandingController {
     public static ObservableList<Appointment> getApptList() {
         return apptList;
     }
+
+//    public static void setApptList(ObservableList<Appointment> apptList) {
+//        MainLandingController.apptList = apptList;
+//    }
     
 }
-
-
-// Moves calendar to current date
-//    @FXML
-//    private void goToCurrentDate(boolean isMonthView) {
-//        // Check if calendar is currently in monthly view
-//        if (isMonthView) {
-//            // Remove current calendarView
-//            mainScreenGrid.getChildren().remove(monthlyCalendarView);
-//            // Get current year-month
-//            YearMonth currentYearMonth = YearMonth.now();
-//            // Create and set new calendarView with current year-month
-//            monthlyCalendar = new MonthlyCalendarView(currentYearMonth);
-//            monthlyCalendarView = monthlyCalendar.getView();
-//            mainScreenGrid.add(monthlyCalendarView, 0, 0);
-//        }
-//        // If calendar is currently in weekly view
-//        else {
-//            // Remove current calendarView
-//            mainScreenGrid.getChildren().remove(weeklyCalendarView);
-//            // Get current date
-//            LocalDate currentLocalDate = LocalDate.now();
-//            // Create and set new calendarView with current date
-//            weeklyCalendar = new WeeklyCalendarView(currentLocalDate);
-//            weeklyCalendarView = weeklyCalendar.getView();
-//            mainScreenGrid.add(weeklyCalendarView, 0, 0);
-//        }
-//    }
-
-
-// Switch calendar between monthly and weekly view
-//    @FXML
-//    private void toggleCalendarView(ActionEvent event) {
-//        // Check if calendar is currently in monthly view
-//        if (monthlyView) {
-//            // Remove current calendarView
-//            mainScreenGrid.getChildren().remove(monthlyCalendarView);
-//            // Get calendar's current year-month
-//            YearMonth currentYearMonth = monthlyCalendar.getCurrentYearMonth();
-//            // Convert year-month to first day of same month
-//            LocalDate currentLocalDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(), 1);
-//            // Create and set new calendarView with first day of month
-//            weeklyCalendar = new WeeklyCalendarView(currentLocalDate);
-//            weeklyCalendarView = weeklyCalendar.getView();
-//            mainScreenGrid.add(weeklyCalendarView, 0, 0);
-//            // Change button to say "Switch to Monthly View"
-//            btnMainScreenToggleView.setText(ResourceBundle.getBundle("MainScreen", Locale.getDefault()).getString("btnToggleViewMonthly"));
-//            // Set monthlyView to show calendar is currently in weekly view
-//            monthlyView = false;
-//        }
-//        // If calendar is currently in weekly view
-//        else {
-//            // Remove current calendarView
-//            mainScreenGrid.getChildren().remove(weeklyCalendarView);
-//            // Get calendar's current date
-//            LocalDate currentLocalDate = weeklyCalendar.getCurrentLocalDate();
-//            // Convert date to year-month
-//            YearMonth currentYearMonth = YearMonth.from(currentLocalDate);
-//            // Create and set new calendarView with year-month
-//            monthlyCalendar = new MonthlyCalendarView(currentYearMonth);
-//            monthlyCalendarView = monthlyCalendar.getView();
-//            mainScreenGrid.add(monthlyCalendarView, 0, 0);
-//            // Change button to say "Switch to Weekly View"
-//            btnMainScreenToggleView.setText(ResourceBundle.getBundle("MainScreen", Locale.getDefault()).getString("btnToggleViewWeekly"));
-//            // Set monthlyView to show calendar is currently in monthly view
-//            monthlyView = true;
-//        }
-//    }

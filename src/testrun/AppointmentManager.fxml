@@ -26,8 +26,8 @@
                </font>
             </Label>
             <ComboBox fx:id="comboCustomerName" disable="true" layoutX="48.0" layoutY="117.0" onAction="#customerNameAction" prefHeight="30.0" prefWidth="325.0" promptText="Customer" />
-            <TextField fx:id="txtTitle" layoutX="48.0" layoutY="156.0" prefHeight="30.0" prefWidth="325.0" promptText="Type" />
-            <TextField fx:id="txtContact" layoutX="48.0" layoutY="192.0" prefHeight="30.0" prefWidth="325.0" promptText="Contact" />
+            <TextField fx:id="txtType" layoutX="48.0" layoutY="156.0" prefHeight="30.0" prefWidth="325.0" promptText="Type" />
+            <TextField fx:id="txtCreatedBy" layoutX="48.0" layoutY="192.0" prefHeight="30.0" prefWidth="325.0" promptText="Contact" />
             <Label fx:id="lblStartTime" layoutX="50.0" layoutY="306.0" text="Start Time" />
             <Label fx:id="lblEndTime" layoutX="48.0" layoutY="363.0" text="End Time" />
             <ComboBox fx:id="comboStartHour" layoutX="50.0" layoutY="323.0" onAction="#startHourAction" prefHeight="30.0" prefWidth="75.0" promptText="Hour" />
@@ -51,8 +51,8 @@
             <TableView fx:id="tableCurrentSchedule" layoutX="14.0" layoutY="80.0" prefHeight="364.0" prefWidth="750.0">
                <columns>
                   <TableColumn fx:id="columnCustNameCurrentSchedule" prefWidth="125.0" text="Name" />
-                  <TableColumn fx:id="columnDescriptionCurrentSchedule" prefWidth="125.0" text="User" />
-                  <TableColumn fx:id="columnTitleCurrentSchedule" prefWidth="125.0" text="Type" />
+                  <TableColumn fx:id="columnCreatedByCurrentSchedule" prefWidth="125.0" text="User" />
+                  <TableColumn fx:id="columnTypeCurrentSchedule" prefWidth="125.0" text="Type" />
                   <TableColumn fx:id="columnLocationCurrentSchedule" prefWidth="125.0" text="Location" />
                   <TableColumn fx:id="columnStartCurrentSchedule" prefWidth="125.0" text="Start" />
                   <TableColumn fx:id="columnEndCurrentSchedule" prefWidth="125.0" text="End" />

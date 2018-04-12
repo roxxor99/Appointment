@@ -68,7 +68,11 @@ public class SQLConnector {
 
         return rs;
     }
-
+        
 //        else{
 //            throw new IOException("Database Cannot Be Initialized");
+
+    public static Connection getCon() {
+        return con;
+    }
 }
