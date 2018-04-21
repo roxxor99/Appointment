@@ -56,6 +56,8 @@
                   <TableColumn fx:id="columnLocationCurrentSchedule" prefWidth="125.0" text="Location" />
                   <TableColumn fx:id="columnStartCurrentSchedule" prefWidth="125.0" text="Start" />
                   <TableColumn fx:id="columnEndCurrentSchedule" prefWidth="125.0" text="End" />
+                  <TableColumn fx:id="columnAppIdCurrentSchedule" prefWidth="75.0" text="appointmentId" visible="false" />
+                  <TableColumn fx:id="columnCusIdCurrentSchedule" prefWidth="75.0" text="columnCusIdCurrentSchedule" visible="false" />
                </columns>
             </TableView>
          </children>

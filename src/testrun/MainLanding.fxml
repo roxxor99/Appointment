@@ -70,6 +70,7 @@
             </Label>
          </buttons>
       </ButtonBar>
+      <Button fx:id="butLog" layoutX="114.0" layoutY="489.0" mnemonicParsing="false" onAction="#logAction" prefHeight="35.0" prefWidth="50.0" text="Log" />
       <Button fx:id="butExit" layoutX="814.0" layoutY="482.0" mnemonicParsing="false" onAction="#exitAction" prefHeight="35.0" prefWidth="50.0" text="Exit" />
    </children>
 </AnchorPane>

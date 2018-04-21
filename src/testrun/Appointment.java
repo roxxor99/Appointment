@@ -41,7 +41,6 @@ public class Appointment {
     //Getters
     public IntegerProperty getAppointmentId() {
         return this.appointmentId;
-        // appointmentId = String query = "SELECT * FROM appointment WHERE appointmentId =" + appointmentId;
     }
 
     public IntegerProperty getCustomerId() {
@@ -109,19 +108,7 @@ public class Appointment {
 
     }
     
-//    public String getStartTxt() {
-//        return this.startTxt.get();
-//    }
-//    public StringProperty startTxtValue(){
-//        return this.startTxt;
-//    }
-//    public StringProperty getEndTxt() {
-//        return this.endTxt;
-//    }
-//    
-//    public StringProperty getDateTxt() {
-//        return this.dateTxt;
-//    }
+
     //Setters
     public void setAppointmentId(int appointmentId) {
         this.appointmentId.set(appointmentId);

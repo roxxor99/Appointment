@@ -66,4 +66,27 @@ public class SQLConnectorData extends SQLConnector {
 
         return customerList;
     }
+    
+//    public static ObservableList<ReportsConsultant> databaseReports() throws SQLException, IOException {
+//        ObservableList<ReportsConsultant> consultantList = FXCollections.observableArrayList();
+//        String sqlQuery = "SELECT * FROM customer INNER JOIN appointment ON customer.customerid=appointment.customerId;";
+//        
+//        ResultSet queryResult = executeQuery(sqlQuery);
+//        while (queryResult.next()) {
+//            ReportsConsultant consultant = new ReportsConsultant();
+////            reportConsultant.setCustomerId(queryResult.getInt("customerid"));
+////            reportConsultant.setAppointmentId(queryResult.getInt("appointmentid"));
+//            consultant.setCustomerName(queryResult.getString("customerName"));
+//            consultant.setCreatedBy(queryResult.getString("createdBy"));
+//            consultant.setTitle(queryResult.getString("title"));
+//            consultant.setLocation(queryResult.getString("location"));
+//            consultant.setStartTime(queryResult.getString("start"));
+//            consultant.setEndTime(queryResult.getString("end"));
+//                        
+//            consultantList.add(consultant);
+//        }
+//
+//        return consultantList;
+//    }
+    
 }

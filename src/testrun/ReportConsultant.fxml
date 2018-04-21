@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="597.0" prefWidth="743.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="testrun.ReportConsultantController">
+   <children>
+      <AnchorPane layoutX="634.0" layoutY="8.0" prefHeight="50.0" prefWidth="219.0" />
+      <ButtonBar layoutX="282.0" layoutY="33.0" prefHeight="50.0" prefWidth="291.0">
+         <buttons>
+            <Label fx:id="lblConsultantSchedule" alignment="CENTER" prefHeight="34.0" prefWidth="313.0" text="Consultant Schedule" textAlignment="CENTER">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+         </buttons>
+      </ButtonBar>
+      <ComboBox fx:id="comboConsultant" layoutX="265.0" layoutY="76.0" onAction="#consultantAction" prefHeight="30.0" prefWidth="325.0" promptText="Consultant" />
+      <TableView fx:id="tableConsultantReport" layoutX="113.0" layoutY="117.0" prefHeight="364.0" prefWidth="628.0">
+         <columns>
+            <TableColumn fx:id="columnCustName" prefWidth="125.0" text="Customer" />
+            <TableColumn fx:id="columnType" prefWidth="125.0" text="Type" />
+            <TableColumn fx:id="columnLocation" prefWidth="125.0" text="Location" />
+            <TableColumn fx:id="columnStart" prefWidth="125.0" text="Start" />
+            <TableColumn fx:id="columnEnd" prefWidth="125.0" text="End" />
+         </columns>
+      </TableView>
+      <Button fx:id="butBack" layoutX="691.0" layoutY="513.0" mnemonicParsing="false" onAction="#backAction" prefHeight="35.0" prefWidth="50.0" text="Back" />
+      <Button fx:id="butUpdate" layoutX="602.0" layoutY="513.0" mnemonicParsing="false" onAction="#updateAction" prefHeight="35.0" prefWidth="65.0" text="Update" />
+   </children>
+</AnchorPane>

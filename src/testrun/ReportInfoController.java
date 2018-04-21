@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package testrun;
 
 import java.io.IOException;
@@ -31,7 +27,13 @@ public class ReportInfoController implements Initializable {
     @FXML
     private Label lblReports;
     @FXML
-    private Button butCancel;
+    private Button butAptType;
+    @FXML
+    private Button butAptLocation;
+    @FXML
+    private Button butConsult;
+    @FXML
+    private Button butBack;
 
     /**
      * Initializes the controller class.
@@ -42,33 +44,55 @@ public class ReportInfoController implements Initializable {
     }    
 
     @FXML
-    private void reportByMonthAction(ActionEvent event) {
+    private void reportByTypeAction(ActionEvent event) throws IOException {
+        Stage stage;
+        Parent root;
+        stage = (Stage) butAptType.getScene().getWindow();
+        root = FXMLLoader.load(getClass().getResource("ReportAptType.fxml"));
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
     }
 
     @FXML
-    private void reportConsultantAction(ActionEvent event) {
+    private void reportByLocationAction(ActionEvent event) throws IOException {
+        Stage stage;
+        Parent root;
+        stage = (Stage) butAptLocation.getScene().getWindow();
+        root = FXMLLoader.load(getClass().getResource("ReportLocation.fxml"));
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
     }
 
     @FXML
-    private void reportMyChoiceAction(ActionEvent event) {
+    private void reportConsultantAction(ActionEvent event) throws IOException {
+        Stage stage;
+        Parent root;
+        stage = (Stage) butConsult.getScene().getWindow();
+        root = FXMLLoader.load(getClass().getResource("ReportConsultant.fxml"));
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
     }
 
     @FXML
-    private void cancelAction(ActionEvent event) throws IOException {
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    private void backAction(ActionEvent event) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation");
-        alert.setHeaderText("Confirm Cancel");
-        alert.setContentText("Are you sure you would like to cancel?");
+        alert.setHeaderText("Confirm Back Navigation");
+        alert.setContentText("Are you sure you would like to return?");
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.OK) {
             Stage stage;
             Parent root;
-            stage = (Stage) lblReports.getScene().getWindow();
+            stage = (Stage) butBack.getScene().getWindow();
             root = FXMLLoader.load(getClass().getResource("MainLanding.fxml"));
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.show();
         }
-    }   
+    }
+    
 }

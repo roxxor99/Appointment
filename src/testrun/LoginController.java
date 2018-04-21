@@ -21,12 +21,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
-
+import static testrun.App.writeToLog;
+//import testrun.App.writeToLog(String);
 
 /**
  * @author Jed Gunderson
  */
 public class LoginController implements Initializable {
+
     Locale currentLocale;
     ResourceBundle rb;
     @FXML
@@ -42,15 +44,18 @@ public class LoginController implements Initializable {
     @FXML
     private Label lblPassword;
     
+    //Get login info
+    //Report login status with the writeToLog method from App
     @FXML
     private void loginAction(ActionEvent event) throws IOException, SQLException {
         // Capturing the data in the username and password fields
         //used to verify user in database
         String loginUsername = txtUsername.getText();
         String loginPassword = txtPassword.getText();
-        
+
         Boolean loginSuccess = SQLConnectorLogin.loginUser(loginUsername, loginPassword);
-        if (loginSuccess){
+        if (loginSuccess) {
+            writeToLog("Username '" + this.txtUsername.getText() + "' was successfully logged in");
             Stage stage;
             Parent root;
             stage = (Stage) butLogin.getScene().getWindow();
@@ -58,17 +63,16 @@ public class LoginController implements Initializable {
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.show();
-        }
-        else {
+        } else {
+            writeToLog("Invalid credentials for the username '" + this.txtUsername.getText() + "'");
             Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(this.rb.getString("LoginFailure"));
-        alert.setHeaderText(this.rb.getString("LoginFailure"));
-        alert.setContentText(this.rb.getString("LoginMessage"));
+            alert.setTitle(this.rb.getString("LoginFailure"));
+            alert.setHeaderText(this.rb.getString("LoginFailure"));
+            alert.setContentText(this.rb.getString("LoginMessage"));
 //        Optional<ButtonType> result = alert.showAndWait();
-          alert.showAndWait();  
+            alert.showAndWait();
         }
-        
-        
+
 //            if (user == null) {
 //                throw new InvalidLoginException("Incorrect username or password.");
 //            }
@@ -77,10 +81,8 @@ public class LoginController implements Initializable {
 //        } catch (InvalidLoginException | AssertionError e) {
 //            MessageBox.setContentText(e.getMessage());
 //        }
-    
-            
-        }
-    
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //Locale will be set on startup
@@ -92,14 +94,12 @@ public class LoginController implements Initializable {
         lblUsername.setText(this.rb.getString("UsernameLabel"));
         lblPassword.setText(this.rb.getString("PasswordLabel"));
         lblTitle.setText(this.rb.getString("Title"));
-        
+
 //        try {
 //            SQLConnector.main(new String[1]);
 //        } catch (SQLException ex) {
 //            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
 //        }
-      
     }
-    
-}
 
+}

@@ -29,7 +29,7 @@ public class SQLConnector {
         con = DriverManager.getConnection(host, username, password);
 
     }
-    //TRYING TO SIMPLIFY moved here from SQLConnectorLogin
+    //COULD SIMPLIFY moved here from SQLConnectorLogin and delete that class
 //    public static Boolean loginUser(String username, String password) throws SQLException, IOException {
 //        Boolean userMatch = false;
 //        String sqlQuery = String.format("SELECT COUNT(userName) FROM user WHERE userName = '%s' AND password = '%s'", username, password);

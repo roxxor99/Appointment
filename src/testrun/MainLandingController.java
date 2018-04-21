@@ -124,6 +124,7 @@
 //    }
 //    
 //}
+
 package testrun;
 
 import java.io.IOException;
@@ -150,6 +151,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+//import testrun.App.writeToLog;
 
 /**
  * FXML Controller class
@@ -188,12 +190,12 @@ public class MainLandingController {
     @FXML
     private Label lblCurrentSchedule;
     @FXML
+    private Button butLog;
+    @FXML
     private Button butExit;
-    
     static ObservableList<Appointment> apptList;
-    
     private boolean isMonth;
-
+    
     /**
      * Initializes the controller class.
      * @throws java.sql.SQLException
@@ -215,12 +217,11 @@ public class MainLandingController {
     //Calendar by month radio
     @FXML
     private void monthlyViewAction(ActionEvent event) throws ParseException {
-//        //populateAptTable(true);
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime nowPlus1 = now.plusMonths(1);
         FilteredList<Appointment> filteredData = new FilteredList<>(apptList);
-        //set predicate is a filter true or false
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        //set predicate will match the elements that will be in the FilteredList
         filteredData.setPredicate(row -> {
             LocalDateTime rowDate = LocalDateTime.parse(row.getStartTime().getValue(), df);
             return rowDate.isAfter(now) && rowDate.isBefore(nowPlus1);
@@ -236,6 +237,7 @@ public class MainLandingController {
         LocalDateTime nowPlus7 = now.plusDays(7);
         FilteredList<Appointment> filteredData = new FilteredList<>(apptList);
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        //set predicate will match the elements that will be in the FilteredList
         filteredData.setPredicate(row -> {
             LocalDateTime rowDate = LocalDateTime.parse(row.getStartTime().getValue(), df);
             return rowDate.isAfter(now) && rowDate.isBefore(nowPlus7);
@@ -275,7 +277,12 @@ public class MainLandingController {
         stage.setScene(scene);
         stage.show();
     }
-
+    
+    @FXML
+    void logAction(ActionEvent event) throws IOException {
+        Runtime.getRuntime().exec("explorer.exe /select,C:\\C195_LogFile\\log.txt");    
+    }
+    
     @FXML
     private void exitAction(ActionEvent event) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -292,9 +299,5 @@ public class MainLandingController {
     public static ObservableList<Appointment> getApptList() {
         return apptList;
     }
-
-//    public static void setApptList(ObservableList<Appointment> apptList) {
-//        MainLandingController.apptList = apptList;
-//    }
     
 }
