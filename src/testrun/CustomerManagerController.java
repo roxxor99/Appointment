@@ -29,7 +29,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import static testrun.MainLandingController.apptList;
+import static testrun.MainLandingController.setApptList;
 import static testrun.SQLConnector.executeQuery;
+import static testrun.SQLConnectorData.databaseAppointments;
 
 /**
  * FXML Controller class
@@ -86,18 +89,11 @@ public class CustomerManagerController {
     //@Override
     public void initialize() throws SQLException, IOException {
         // Assign data to columns in =>tableCurrentSchedule
-        columnAddressCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
-        columnDescriptionCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getAddress());
-        columnCityCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCity());
-        columnCountryCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCountry());
-        columnZipCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getPostalCode());
-        columnPhoneCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getPhone());
-
-        tableCurrentSchedule.setItems(SQLConnectorData.databaseCustomer());
+        tableData();
     }
 
     @FXML
-    private void saveAction(ActionEvent event) {
+    private void saveAction(ActionEvent event) throws SQLException, IOException {
         String customerName = txtCustomerName.getText();
         String address = txtAddress.getText();
         String country = txtCountry.getText();
@@ -115,7 +111,7 @@ public class CustomerManagerController {
             mainScreenStage.show();
 
             if (tableCurrentSchedule.getSelectionModel().isEmpty()) {
-
+                //!EXAMPLE from appointment SAVE
 //                String sqlAppointmentInsert = "INSERT INTO appointment (customerId, title, description, location, contact, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy)"
 //                        + "VALUES (?, ?, '', ?, '', '', ?, ?, now(), ?, now(), ?);";
 //                
@@ -127,11 +123,9 @@ public class CustomerManagerController {
 //                statement.setTimestamp(5, updateEndTime);
 //                statement.setString(6, createdBy);
 //                statement.setString(7, createdBy);
-            
 
-            //Dealing with 4 different tables Customer/Address/Country/City......
-            //"SELECT * FROM customer INNER JOIN address ON customer.addressId=address.addressId INNER JOIN city ON address.cityId=city.cityId INNER JOIN country ON city.countryId=country.countryId;";
-            
+                //Dealing with 4 different tables Customer/Address/Country/City......
+                //"SELECT * FROM customer INNER JOIN address ON customer.addressId=address.addressId INNER JOIN city ON address.cityId=city.cityId INNER JOIN country ON city.countryId=country.countryId;";
 //            // Retrieve customer information from database
 //            ResultSet customerResultSet = stmt.executeQuery("SELECT customerName, active, addressId FROM customer WHERE customerId = " + customerId);
 //            // Retrieve address information from database
@@ -140,10 +134,13 @@ public class CustomerManagerController {
 //            ResultSet cityResultSet = stmt.executeQuery("SELECT city, countryId FROM city WHERE cityId = " + cityId);    
 //            // Retrieve country information from database
 //            ResultSet countryResultSet = stmt.executeQuery("SELECT country FROM country WHERE countryId = " + countryId);
-            
-            
-            String sqlCustomerInsert = "INSERT INTO customer (customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy,  address, address2, cityId, city, countryId, country, postalCode, phone)"
-                        + "VALUES (?, '', '', now(), ?, now(), ?, ?, '', '', ?, '', ?, ?, ?)";
+//            String sqlCustomerInsert = "INSERT INTO customer INNER JOIN address ON customer.addressId=address.addressId INNER JOIN city ON address.cityId=city.cityId INNER JOIN country ON city.countryId=country.countryId;"
+//            String sqlCustomerInsert = "INSERT INTO customer (customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy,  address, address2, cityId, city, countryId, country, postalCode, phone)"
+//                        + "VALUES (?, ?, '', now(), ?, now(), ?, ?, '', ?, ?, ?, ?, ?, ?)";
+                //using java's String.join to combine multiple queries
+                String sqlCustomerInsert = String.join(" ",
+                        "INSERT INTO customer (customerId, customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy)",
+                        "VALUES (?, ?, ?, 1, NOW(), ?, NOW(), ?)");
 
                 PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlCustomerInsert);
                 statement.setString(1, customerName);
@@ -161,10 +158,15 @@ public class CustomerManagerController {
             } else {
                 customerId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue();
 
-                //Use UPDATE and the WHERE clause do not use INSERT for edits
-                String sqlCustomerUpdate = "UPDATE customer SET (customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy,  address, address2, cityId, city, countryId, country, postalCode, phone, WHERE customerId)"
-                        + "VALUES (?, ?, 'active', now(), ?, now(), ?, ?, '', ?, ?, ?, ?, ?, ?)";
-                
+                String sqlCustomerUpdate = "UPDATE customer, address, city, country"
+                        + "INNER JOIN address ON customer.addressId=address.addressId"
+                        + "INNER JOIN city ON address.cityId=city.cityId"
+                        + "INNER JOIN country ON city.countryId=country.countryId"
+                        + "SET customerName=?, address=?, country=?,city=?,postalCode=?,phone=?"
+                        + "WHERE customerId = ?";
+
+//                String sqlCustomerUpdate = "UPDATE customer SET (customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy,  address, address2, cityId, city, countryId, country, postalCode, phone, WHERE customerId)"
+//                        + "VALUES (?, ?, 'active', now(), ?, now(), ?, ?, '', ?, ?, ?, ?, ?, ?)";
                 PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlCustomerUpdate);
                 statement.setString(1, customerName);
                 statement.setString(2, address);
@@ -172,8 +174,8 @@ public class CustomerManagerController {
                 statement.setString(4, city);
                 statement.setString(5, postalCode);
                 statement.setString(6, phone);
-                statement.setInt(7, customerId );
-                    //statement.setInt(7, tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue());
+                statement.setInt(7, customerId);
+                //statement.setInt(7, tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue());
 
                 //Use executeUpdate(INSERT/MOD/DELETE) instead of executeQuery(Query the data)
                 int rowsInserted = statement.executeUpdate();
@@ -186,10 +188,11 @@ public class CustomerManagerController {
         } catch (IOException ex) {
             Logger.getLogger(AppointmentManagerController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        tableData();
     }
 
     @FXML
-    private void deleteAction(ActionEvent event) throws SQLException {
+    private void deleteAction(ActionEvent event) throws SQLException, IOException {
         Customer cust = tableCurrentSchedule.getSelectionModel().getSelectedItem();
 
         if (cust == null) {
@@ -214,6 +217,7 @@ public class CustomerManagerController {
             statement.setInt(1, tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue());
             statement.executeUpdate();
         }
+        tableData();
     }
 
     @FXML
@@ -237,7 +241,7 @@ public class CustomerManagerController {
 
     @FXML
     private void modifyAction(ActionEvent event) {
-        
+
         txtCustomerName.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerName().getValue());
         txtAddress.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getAddress().getValue());
         txtCountry.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCountry().getValue());
@@ -245,47 +249,16 @@ public class CustomerManagerController {
         txtZip.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getPostalCode().getValue());
         txtPhone.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getPhone().getValue());
     }
-    //Populate the Customer Combobox
-//        private void populateCustomer() throws SQLException {
-//        //get db connection
-//        PreparedStatement statement = SQLConnector.getCon().prepareStatement("SELECT customerId, customerName FROM customer ORDER BY customerName ASC;");
-//        
-//
-//        scheduler.prepStatement = scheduler.connection.prepareStatement("SELECT customerId, customerName FROM customer WHERE active = 1 ORDER BY customerName ASC;");
-//        System.out.println(scheduler.prepStatement.toString());
-//        
-//        ResultSet rs = scheduler.RUNMYSQL(scheduler.prepStatement, x -> scheduler.query(x));
-//        
-//        ObservableList<Customer> customers = FXCollections.observableArrayList();
-//        
-//        while(rs.next()) {
-//            customers.add(
-//                    new Customer(
-//                        rs.getInt("customerId"), 
-//                        rs.getString("customerName"), "", 1
-//                    )
-//            );
-//        }
-//        
-//        scheduler.prepStatement.close();
-//        rs.close();
-//        
-//        this.aptCustomer.setItems(customers);
-//        
-//        StringConverter<Customer> converter = new StringConverter<Customer>() {
-//            @Override
-//            public String toString(Customer customer) {
-//                return customer.nameProperty().get();
-//            }
-//            
-//            @Override
-//            public Customer fromString(String id) {
-//                return customers.stream()
-//                        .filter(item -> item.customerIDProperty().toString().equals(id))
-//                        .collect(Collectors.toList()).get(0);
-//            }
-//        };
-//        
-//        this.aptCustomer.setConverter(converter);
-//    }
+
+    private void tableData() throws SQLException, IOException {
+        columnAddressCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
+        columnDescriptionCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getAddress());
+        columnCityCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCity());
+        columnCountryCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCountry());
+        columnZipCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getPostalCode());
+        columnPhoneCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getPhone());
+
+        tableCurrentSchedule.setItems(SQLConnectorData.databaseCustomer());
+
+    }
 }

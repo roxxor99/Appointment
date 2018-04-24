@@ -1,4 +1,3 @@
-
 package testrun;
 
 import java.io.IOException;
@@ -12,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,7 +26,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
-import static testrun.MainLandingController.apptList;
+import static testrun.MainLandingController.getApptList;
 import static testrun.SQLConnector.executeQuery;
 
 /**
@@ -41,42 +41,47 @@ public class ReportConsultantController implements Initializable {
     @FXML
     private ComboBox<String> comboConsultant;
     @FXML
-    private TableView<ReportsConsultant> tableConsultantReport;
+    private TableView<Appointment> tableConsultantReport;
     @FXML
-    private TableColumn<ReportsConsultant, String> columnCustName;
+    private TableColumn<Appointment, String> columnCustName;
     @FXML
-    private TableColumn<ReportsConsultant, String> columnType;
+    private TableColumn<Appointment, String> columnType;
     @FXML
-    private TableColumn<ReportsConsultant, String> columnLocation;
+    private TableColumn<Appointment, String> columnLocation;
     @FXML
-    private TableColumn<ReportsConsultant, String> columnStart;
+    private TableColumn<Appointment, String> columnStart;
     @FXML
-    private TableColumn<ReportsConsultant, String> columnEnd;
+    private TableColumn<Appointment, String> columnEnd;
     @FXML
     private Button butBack;
     @FXML
     private Button butUpdate;
+//    private final ObservableList<String> consultants = FXCollections.observableArrayList();
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        columnCustName.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
-//        columnCreatedByCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
-        columnType.setCellValueFactory(cellData -> cellData.getValue().getTitle());
-        columnLocation.setCellValueFactory(cellData -> cellData.getValue().getLocation());
-        columnStart.setCellValueFactory(cellData -> cellData.getValue().getStart());
-        columnEnd.setCellValueFactory(cellData -> cellData.getValue().getEnd());
 //        columnAppIdCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getAppointmentId());
 //        columnCusIdCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerId());
-        
-//        tableConsultantReport.setItems(SQLConnectorData.databaseReports());
-//        apptList = MainLandingController.getApptList();
-//        tableConsultantReport.setItems(apptList);
+        columnCustName.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
+        columnType.setCellValueFactory(cellData -> cellData.getValue().getTitle());
+        columnLocation.setCellValueFactory(cellData -> cellData.getValue().getLocation());
+        columnStart.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
+        columnEnd.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
+        try {
+            tableConsultantReport.setItems(SQLConnectorData.databaseAppointments());
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ReportConsultantController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ReportConsultantController.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //Populate ComboBox Consultant
         String consultantApts = "SELECT DISTINCT createdBy FROM appointment ORDER BY createdBy ASC;";
+
         try {
             ResultSet rs = executeQuery(consultantApts);
             {
@@ -92,10 +97,17 @@ public class ReportConsultantController implements Initializable {
     }
 
     @FXML
-    private void consultantAction(ActionEvent event) {
-        //dropdownbox 
-    }
+    private void consultantAction(ActionEvent event) throws SQLException {
+//        FilteredList<Appointment> aptFilList = new FilteredList<>();
+        String cmbCon = comboConsultant.getValue();
+        
+        ObservableList<Appointment> appointmentList = getApptList();
+        FilteredList<Appointment> filteredData = new FilteredList<>(appointmentList);
+        filteredData.setPredicate(p -> p.getCreatedBy().getValue().contains(cmbCon));
+        tableConsultantReport.setItems(filteredData);
 
+    }
+                      
     @FXML
     private void backAction(ActionEvent event) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -114,39 +126,4 @@ public class ReportConsultantController implements Initializable {
             stage.show();
         }
     }
-
-    @FXML
-    private void updateAction(ActionEvent event) throws SQLException, IOException {
-        String sqlConsultant = ("SELECT a.location, a.title, a.start, a.end, c.customerName "
-                + "FROM appointment a " 
-                + "INNER JOIN customer c ON c.customerId = a.customerId "
-                + "WHERE a.createdBy = ? "
-                + "ORDER BY a.start ASC");
-//        String sqlConsultant = "SELECT DISTINCT appointmentId FROM appointment (title, location, start, end, createdBy,);";
-
-        PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlConsultant);
-        //statement.setString(1, ?);
-        ResultSet rs = executeQuery(sqlConsultant);
-        ObservableList<ReportsConsultant> reportData = FXCollections.observableArrayList();
-        
-        while (rs.next()) {
-            reportData.add(
-                    new ReportsConsultant(
-                            rs.getString("customerName"),
-                            rs.getString("title"),
-                            rs.getString("location"),
-                            rs.getString("start"),
-                            rs.getString("end")
-                    //                        zStart.toLocalDate().toString(),
-                    //                        zStart.toLocalTime().toString(),
-                    //                        zEnd.toLocalTime().toString(),
-                    //rs.getString("location")
-                    )
-            );
-
-        }
-        this.tableConsultantReport.setItems(reportData);
-
-    }
-
 }

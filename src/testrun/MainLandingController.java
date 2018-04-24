@@ -1,8 +1,4 @@
 
-//    public void initialize() throws SQLException, IOException {
-//        apptList = SQLConnectorData.databaseAppointments();
-//        
-//    }
 //    private void populateAptTable(boolean isMonth) throws ParseException {
 //        // Assign data to columns in =>tableMainCurrentSchedule
 //        LocalDate now = LocalDate.now();
@@ -49,81 +45,6 @@
 //                }
 //            }
 //        }
-//        columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
-//        columnDescriptionCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
-//        columnTitleCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getTitle());
-//        columnLocationCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getLocation());
-//        columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
-//        columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
-//        tableMainCurrentSchedule.setItems(filteredList);
-//    }
-//
-//    
-//    //Calendar by month radio
-//    @FXML
-//    private void monthlyViewAction(ActionEvent event) throws ParseException {
-//        populateAptTable(true);
-//        
-//    }
-//    
-//    //Calendar by week radio
-//    @FXML
-//    private void weeklyViewAction(ActionEvent event) throws ParseException {
-//        populateAptTable(false);
-//        
-//    }
-//    
-//    @FXML
-//    private void manageCustomersAction(ActionEvent event) throws IOException {
-//    Stage stage;
-//        Parent root;
-//        stage = (Stage) butManageCustomers.getScene().getWindow();
-//        root = FXMLLoader.load(getClass().getResource("CustomerManager.fxml"));
-//        Scene scene = new Scene(root);
-//        stage.setScene(scene);
-//        stage.show();
-//    }
-//
-//    @FXML
-//    private void manageAppointmentsAction(ActionEvent event) throws IOException {
-//    Stage stage;
-//        Parent root;
-//        stage = (Stage) butManageAppointments.getScene().getWindow();
-//        root = FXMLLoader.load(getClass().getResource("AppointmentManager.fxml"));
-//        Scene scene = new Scene(root);
-//        stage.setScene(scene);
-//        stage.show();
-//    }
-//    
-//    @FXML
-//    private void manageReportsAction(ActionEvent event) throws IOException {
-//        Stage stage;
-//        Parent root;
-//        stage = (Stage) butManageReports.getScene().getWindow();
-//        root = FXMLLoader.load(getClass().getResource("ReportInfo.fxml"));
-//        Scene scene = new Scene(root);
-//        stage.setScene(scene);
-//        stage.show();
-//    }
-//    
-//    @FXML
-//    private void exitAction(ActionEvent event) {
-//    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//        alert.initModality(Modality.NONE);
-//        alert.setTitle("Confirmation ");
-//        alert.setHeaderText("Confirm Exit");
-//        alert.setContentText("Are you sure you want to exit?");
-//        Optional<ButtonType> result = alert.showAndWait();
-//        if (result.get() == ButtonType.OK) {
-//            System.exit(0);
-//        }
-//    }
-//
-//    public static ObservableList<Appointment> getApptList() {
-//        return apptList;
-//    }
-//    
-//}
 
 package testrun;
 
@@ -226,7 +147,6 @@ public class MainLandingController {
             LocalDateTime rowDate = LocalDateTime.parse(row.getStartTime().getValue(), df);
             return rowDate.isAfter(now) && rowDate.isBefore(nowPlus1);
         });
-        //tableMainCurrentSchedule.getItems().clear();
         tableMainCurrentSchedule.setItems(filteredData);
     }
 
@@ -299,5 +219,10 @@ public class MainLandingController {
     public static ObservableList<Appointment> getApptList() {
         return apptList;
     }
+
+    public static void setApptList(ObservableList<Appointment> apptList) {
+        MainLandingController.apptList = apptList;
+    }
+    
     
 }

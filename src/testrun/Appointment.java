@@ -1,6 +1,5 @@
 package testrun;
 
-import java.util.Date;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -29,13 +28,17 @@ public class Appointment {
     private StringProperty lastUpdate = new SimpleStringProperty();
     private StringProperty lastUpdateBy = new SimpleStringProperty();
     
-    private Date startDate;
-    private Date endDate;
+//    private Date startDate;
+//    private Date endDate;
 //    private StringProperty dateTxt = new SimpleStringProperty();
 //    private StringProperty startTxt = new SimpleStringProperty();
 //    private StringProperty endTxt = new SimpleStringProperty();
 
     public Appointment() {
+    }
+
+    Appointment(String string, String string0, String string1, String string2, String string3) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     //Getters
@@ -80,13 +83,13 @@ public class Appointment {
         return this.endTime;
     }
 
-    public Date getStartDate() {
-        return this.startDate;
-    }
+//    public Date getStartDate() {
+//        return this.startDate;
+//    }
 
-    public Date getEndDate() {
-        return this.endDate;
-    }
+//    public Date getEndDate() {
+//        return this.endDate;
+//    }
     
     public StringProperty getCreatedBy() {
         return this.createdBy;
@@ -150,13 +153,13 @@ public class Appointment {
         this.endTime.set(endTime);
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
+//    public void setStartDate(Date startDate) {
+//        this.startDate = startDate;
+//    }
+//
+//    public void setEndDate(Date endDate) {
+//        this.endDate = endDate;
+//    }
     
     public void setCreatedBy(String createdBy) {
         this.createdBy.set(createdBy);

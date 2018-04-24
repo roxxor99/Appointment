@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package testrun;
 
 import java.io.IOException;
@@ -13,6 +8,8 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,6 +24,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
+import static testrun.MainLandingController.getApptList;
 import static testrun.SQLConnector.executeQuery;
 
 /**
@@ -65,16 +63,23 @@ public class ReportLocationController implements Initializable {
         columnCustName.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
         columnConsultant.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
         columnType.setCellValueFactory(cellData -> cellData.getValue().getTitle());
-//        columnLocation.setCellValueFactory(cellData -> cellData.getValue().getLocation());
         columnStart.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
         columnEnd.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
-        
-//        tableLocationReport.setItems(SQLConnectorData.databaseAppointments());
 
-//Populate ComboBox Location
-        String consultantApts = "SELECT DISTINCT location FROM appointment ORDER BY location ASC;";
         try {
-            ResultSet rs = executeQuery(consultantApts);
+            tableLocationReport.setItems(SQLConnectorData.databaseAppointments());
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ReportLocationController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ReportLocationController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //Populate ComboBox Location
+        String locationApts = "SELECT DISTINCT location FROM appointment ORDER BY location ASC;";
+
+        try {
+            ResultSet rs = executeQuery(locationApts);
             {
                 while (rs.next()) {
                     comboLocation.getItems().add(rs.getString("location"));
@@ -89,6 +94,12 @@ public class ReportLocationController implements Initializable {
 
     @FXML
     private void locationAction(ActionEvent event) {
+        String cmbLoc = comboLocation.getValue();
+        
+        ObservableList<Appointment> locationList = getApptList();
+        FilteredList<Appointment> filteredData = new FilteredList<>(locationList);
+        filteredData.setPredicate(p -> p.getLocation().getValue().contains(cmbLoc));
+        tableLocationReport.setItems(filteredData);
     }
 
     @FXML
@@ -109,9 +120,4 @@ public class ReportLocationController implements Initializable {
             stage.show();
         }
     }
-
-    @FXML
-    private void updateAction(ActionEvent event) {
-    }
-
 }

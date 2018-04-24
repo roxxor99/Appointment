@@ -1,14 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package testrun;
 
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -24,11 +22,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import static testrun.SQLConnector.executeQuery;
 
@@ -42,38 +38,53 @@ public class ReportAptTypeController implements Initializable {
     @FXML
     private Label lblTypeSchedule;
     @FXML
-    private TableView<Reports> tableTypeReport;
+    private TableView<ReportAptType> tableTypeReport;
     @FXML
-    private TableColumn<Reports, String> columnType;
+    private TableColumn<ReportAptType, String> columnType;
     @FXML
-    private TableColumn<Reports, Integer> columnTotal;
+    private TableColumn<ReportAptType, Integer> columnTotal;
     @FXML
-    private TableColumn<Reports, String> columnMonth;
-    @FXML
-    private TableColumn<Reports, String> columnYear;
+    private TableColumn<ReportAptType, String> columnDate;
     @FXML
     private Button butBack;
-    
-    private ObservableList<Reports> records = FXCollections.observableArrayList();
+
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //update view to match query results from below.
-        columnType.setCellValueFactory(cellData -> cellData.getValue().title());
-        columnTotal.setCellValueFactory(cellData -> cellData.getValue().total().asObject());
-        columnMonth.setCellValueFactory(cellData -> cellData.getValue().date());
-        //columnYear.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
-
+        columnType.setCellValueFactory(cellData -> cellData.getValue().getTitle());
+        columnTotal.setCellValueFactory(cellData -> cellData.getValue().getTotal().asObject());
+        columnDate.setCellValueFactory(cellData -> cellData.getValue().getMonthYear());
         
-//This query retrives the exaCT DATA needed for the rubric 
-        String type = "SELECT title, Count(appointmentId) AS total, Month(start) as theMonth, Year(start) AS theYear FROM appointment GROUP BY title, Year(start), Month(start) ORDER BY title, Year(start) ASC, Month(start) ASC;";
-        
-    }    
+        try {
+            tableTypeReport.setItems(databaseReportAptType());
+        } catch (SQLException ex) {
+            Logger.getLogger(ReportAptTypeController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ReportAptTypeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
-    @FXML
-    private void typeAction(ActionEvent event) {
+    public static ObservableList<ReportAptType> databaseReportAptType() throws SQLException, IOException {
+        ObservableList<ReportAptType> reportAptTypeList = FXCollections.observableArrayList();
+        String typeApts = "SELECT DISTINCT title, Count(appointmentId) AS total, Month(start) as theMonth, Year(start) AS theYear FROM appointment GROUP BY title, Year(start), Month(start) ORDER BY title, Year(start) ASC, Month(start) ASC;";
+//        String typeApts = "SELECT Count(appointmentId) AS total, Month(start) as theMonth, Year(start) AS theYear, title FROM appointment GROUP BY Year(start), Month(start), title ORDER BY Year(start) ASC, Month(start) ASC, title ASC;";
+        ResultSet rs = executeQuery(typeApts);
+
+        while (rs.next()) {
+//            LocalDate month = LocalDate.of(rs.getInt("theYear"), rs.getInt("theMonth"), 1);
+//            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMMM yyyy");
+            
+            ReportAptType reportAptType = new ReportAptType();
+            reportAptType.setTitle(rs.getString("title"));
+            reportAptType.setTotal(rs.getInt("total"));
+//            reportAptType.setMonthYear(rs.getString("monthYear"));
+//            month.format(dtf);
+            reportAptTypeList.add(reportAptType);
+        }
+
+        return reportAptTypeList;
     }
 
     @FXML
@@ -94,9 +105,4 @@ public class ReportAptTypeController implements Initializable {
             stage.show();
         }
     }
-
-    @FXML
-    private void updateAction(ActionEvent event) {
-    }
-    
 }

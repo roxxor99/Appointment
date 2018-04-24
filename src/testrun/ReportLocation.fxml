@@ -32,6 +32,5 @@
          </columns>
       </TableView>
       <Button fx:id="butBack" layoutX="691.0" layoutY="513.0" mnemonicParsing="false" onAction="#backAction" prefHeight="35.0" prefWidth="50.0" text="Back" />
-      <Button fx:id="butUpdate" layoutX="602.0" layoutY="513.0" mnemonicParsing="false" onAction="#updateAction" prefHeight="35.0" prefWidth="65.0" text="Update" />
    </children>
 </AnchorPane>

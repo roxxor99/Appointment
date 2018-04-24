@@ -20,12 +20,11 @@
             </Label>
          </buttons>
       </ButtonBar>
-      <TableView fx:id="tableTypeReport" layoutX="113.0" layoutY="117.0" prefHeight="364.0" prefWidth="628.0">
+      <TableView fx:id="tableTypeReport" layoutX="113.0" layoutY="117.0" prefHeight="364.0" prefWidth="632.0">
          <columns>
-            <TableColumn fx:id="columnType" prefWidth="157.0" text="Type" />
-            <TableColumn fx:id="columnTotal" prefWidth="157.0" text="Total Records" />
-            <TableColumn fx:id="columnMonth" prefWidth="157.0" text="Month (0-12)" />
-            <TableColumn fx:id="columnYear" prefWidth="157.0" text="Year" />
+            <TableColumn fx:id="columnType" prefWidth="210.0" text="Type" />
+            <TableColumn fx:id="columnTotal" prefWidth="210.0" text="Total Records" />
+            <TableColumn fx:id="columnDate" prefWidth="210.0" text="Date" />
          </columns>
       </TableView>
       <Button fx:id="butBack" layoutX="691.0" layoutY="513.0" mnemonicParsing="false" onAction="#backAction" prefHeight="35.0" prefWidth="50.0" text="Back" />
