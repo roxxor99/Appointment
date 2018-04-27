@@ -1,21 +1,16 @@
 package testrun;
 
 import java.io.IOException;
-import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -28,11 +23,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
-import static testrun.MainLandingController.apptList;
-import static testrun.MainLandingController.setApptList;
 import static testrun.SQLConnector.executeQuery;
-import static testrun.SQLConnectorData.databaseAppointments;
 
 /**
  * FXML Controller class
@@ -52,9 +43,9 @@ public class CustomerManagerController {
     @FXML
     private TextField txtAddress;
     @FXML
-    private TextField txtCountry;
+    private ComboBox<String> comboCountry;
     @FXML
-    private TextField txtCity;
+    private ComboBox<String> comboCity;
     @FXML
     private TextField txtPhone;
     @FXML
@@ -81,27 +72,40 @@ public class CustomerManagerController {
     private TableColumn<Customer, String> columnZipCurrentCustomers;
     @FXML
     private TableColumn<Customer, String> columnPhoneCurrentCustomers;
-    //static ObservableList<Customer> customerList;
+    @FXML
+    private TableColumn<Customer, String> columnCityIdCurrentCustomers;
 
     /**
      * Initializes the controller class.
      */
     //@Override
     public void initialize() throws SQLException, IOException {
-        // Assign data to columns in =>tableCurrentSchedule
+        //Populate Tableview
         tableData();
+        
+        //Populate ComboBox Country
+        String sqlCountry = "SELECT countryId, country FROM country;";
+        try {
+            ResultSet rs = executeQuery(sqlCountry);
+            {
+                while (rs.next()) {
+                    comboCountry.getItems().add(rs.getString("country") + ":" + rs.getString("countryId"));
+                }
+            }
+        } catch (SQLException ex) {
+        }
     }
 
     @FXML
     private void saveAction(ActionEvent event) throws SQLException, IOException {
         String customerName = txtCustomerName.getText();
         String address = txtAddress.getText();
-        String country = txtCountry.getText();
-        String city = txtCity.getText();
+        String country = comboCountry.getSelectionModel().getSelectedItem();
+        String city = comboCity.getSelectionModel().getSelectedItem();
         String postalCode = txtZip.getText();
         String phone = txtPhone.getText();
-
-        Integer customerId = null;
+        String cityId = comboCountry.getSelectionModel().getSelectedItem().split(":")[1];
+//        String sqlCityId = "SELECT cityId, city FROM city WHERE cityId ="+cityId;
 
         try {
             Parent mainScreenParent = FXMLLoader.load(getClass().getResource("MainLanding.fxml"));
@@ -111,44 +115,24 @@ public class CustomerManagerController {
             mainScreenStage.show();
 
             if (tableCurrentSchedule.getSelectionModel().isEmpty()) {
-                //!EXAMPLE from appointment SAVE
-//                String sqlAppointmentInsert = "INSERT INTO appointment (customerId, title, description, location, contact, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy)"
-//                        + "VALUES (?, ?, '', ?, '', '', ?, ?, now(), ?, now(), ?);";
-//                
-//                PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAppointmentInsert);
-//                statement.setString(1, customerId);
-//                statement.setString(2, type);
-//                statement.setString(3, location);
-//                statement.setTimestamp(4, updateStartTime);
-//                statement.setTimestamp(5, updateEndTime);
-//                statement.setString(6, createdBy);
-//                statement.setString(7, createdBy);
+                //insert address first
+                String sqlAddressInsert = "INSERT INTO address (address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdate, lastUpdateBy)"
+                        + "VALUES (?,'', ?, ?, ?, now(), ?, now(), ?)";
+                PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAddressInsert);
+                statement.setString(1, address);
+                statement.setString(2, cityId);
+                statement.setString(3, postalCode);
+                statement.setString(4, phone);
+                statement.setString(5, LoginController.getLoggedInUser());
+                statement.setString(6, LoginController.getLoggedInUser());
 
-                //Dealing with 4 different tables Customer/Address/Country/City......
-                //"SELECT * FROM customer INNER JOIN address ON customer.addressId=address.addressId INNER JOIN city ON address.cityId=city.cityId INNER JOIN country ON city.countryId=country.countryId;";
-//            // Retrieve customer information from database
-//            ResultSet customerResultSet = stmt.executeQuery("SELECT customerName, active, addressId FROM customer WHERE customerId = " + customerId);
-//            // Retrieve address information from database
-//            ResultSet addressResultSet = stmt.executeQuery("SELECT address, address2, postalCode, phone, cityId FROM address WHERE addressId = " + addressId);
-//            // Retrieve city information from database
-//            ResultSet cityResultSet = stmt.executeQuery("SELECT city, countryId FROM city WHERE cityId = " + cityId);    
-//            // Retrieve country information from database
-//            ResultSet countryResultSet = stmt.executeQuery("SELECT country FROM country WHERE countryId = " + countryId);
-//            String sqlCustomerInsert = "INSERT INTO customer INNER JOIN address ON customer.addressId=address.addressId INNER JOIN city ON address.cityId=city.cityId INNER JOIN country ON city.countryId=country.countryId;"
-//            String sqlCustomerInsert = "INSERT INTO customer (customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy,  address, address2, cityId, city, countryId, country, postalCode, phone)"
-//                        + "VALUES (?, ?, '', now(), ?, now(), ?, ?, '', ?, ?, ?, ?, ?, ?)";
-                //using java's String.join to combine multiple queries
-                String sqlCustomerInsert = String.join(" ",
-                        "INSERT INTO customer (customerId, customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy)",
-                        "VALUES (?, ?, ?, 1, NOW(), ?, NOW(), ?)");
-
-                PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlCustomerInsert);
+                //insert customer second
+                String sqlCustomerInsert = "INSERT INTO customer (customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy)"
+                        + "VALUES (?, LAST_INSERT_ID(), 0, now(), ?, now(), ?)";
+                statement = SQLConnector.getCon().prepareStatement(sqlCustomerInsert);
                 statement.setString(1, customerName);
-                statement.setString(2, address);
-                statement.setString(3, country);
-                statement.setString(4, city);
-                statement.setString(5, postalCode);
-                statement.setString(6, phone);
+                statement.setString(2, LoginController.getLoggedInUser());
+                statement.setString(3, LoginController.getLoggedInUser());
 
                 //Use executeUpdate instead of executeQuery
                 int rowsInserted = statement.executeUpdate();
@@ -156,26 +140,23 @@ public class CustomerManagerController {
                     System.out.println("A new user was inserted successfully!");
                 }
             } else {
-                customerId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue();
+                String customerId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue();
 
-                String sqlCustomerUpdate = "UPDATE customer, address, city, country"
-                        + "INNER JOIN address ON customer.addressId=address.addressId"
-                        + "INNER JOIN city ON address.cityId=city.cityId"
-                        + "INNER JOIN country ON city.countryId=country.countryId"
-                        + "SET customerName=?, address=?, country=?,city=?,postalCode=?,phone=?"
-                        + "WHERE customerId = ?";
+                String sqlAddressUpdate = "UPDATE address SET address=?, cityId=?, postalCode=?, phone=?, lastUpdate=now(), lastUpdateBy=?"
+                        + "WHERE addressId = ?";
+                PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAddressUpdate);
+                statement.setString(1, address);
+                statement.setString(2, cityId);
+                statement.setString(3, postalCode);
+                statement.setString(4, phone);
+                statement.setString(5, LoginController.getLoggedInUser());
 
-//                String sqlCustomerUpdate = "UPDATE customer SET (customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy,  address, address2, cityId, city, countryId, country, postalCode, phone, WHERE customerId)"
-//                        + "VALUES (?, ?, 'active', now(), ?, now(), ?, ?, '', ?, ?, ?, ?, ?, ?)";
-                PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlCustomerUpdate);
+                String sqlCustomerUpdate = "UPDATE customer SET customerName=?, lastUpdate=now(), lastUpdateBy=?"
+                        + "WHERE customerId=?";
+                statement = SQLConnector.getCon().prepareStatement(sqlCustomerUpdate);
                 statement.setString(1, customerName);
-                statement.setString(2, address);
-                statement.setString(3, country);
-                statement.setString(4, city);
-                statement.setString(5, postalCode);
-                statement.setString(6, phone);
-                statement.setInt(7, customerId);
-                //statement.setInt(7, tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue());
+                statement.setString(2, LoginController.getLoggedInUser());
+                statement.setString(3, customerId);
 
                 //Use executeUpdate(INSERT/MOD/DELETE) instead of executeQuery(Query the data)
                 int rowsInserted = statement.executeUpdate();
@@ -188,6 +169,7 @@ public class CustomerManagerController {
         } catch (IOException ex) {
             Logger.getLogger(AppointmentManagerController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        //refreshes the table and DB data
         tableData();
     }
 
@@ -214,7 +196,7 @@ public class CustomerManagerController {
         if (result.get() == ButtonType.OK) {
             String sqlCustomerDelete = "DELETE FROM customer WHERE customerId = ?;";
             PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlCustomerDelete);
-            statement.setInt(1, tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue());
+            statement.setString(1, tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue());
             statement.executeUpdate();
         }
         tableData();
@@ -241,15 +223,21 @@ public class CustomerManagerController {
 
     @FXML
     private void modifyAction(ActionEvent event) {
-
         txtCustomerName.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerName().getValue());
         txtAddress.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getAddress().getValue());
-        txtCountry.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCountry().getValue());
-        txtCity.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCity().getValue());
+
+        //Need to set country AND id 
+        String tmpCountry = tableCurrentSchedule.getSelectionModel().getSelectedItem().getCountry().getValue();
+        String tmpCountryId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getCountryId().getValue();
+        String catCountry = tmpCountry + ":" + tmpCountryId;
+//        comboCountry.setValue(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCountry().getValue());
+        comboCountry.setValue(catCountry);
+        
+        comboCity.setValue(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCity().getValue());
         txtZip.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getPostalCode().getValue());
         txtPhone.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getPhone().getValue());
     }
-
+    
     private void tableData() throws SQLException, IOException {
         columnAddressCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
         columnDescriptionCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getAddress());
@@ -257,8 +245,76 @@ public class CustomerManagerController {
         columnCountryCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCountry());
         columnZipCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getPostalCode());
         columnPhoneCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getPhone());
+        columnCityIdCurrentCustomers.setCellValueFactory(cellData -> cellData.getValue().getCityId());
 
         tableCurrentSchedule.setItems(SQLConnectorData.databaseCustomer());
+    }
 
+    @FXML
+    void cityAction(ActionEvent event) throws IOException {
+        //"SELECT countryId FROM country WHERE country =?;";
+    }
+
+    //get appropriate City from Country dropdown selection
+    @FXML
+    void countryAction(ActionEvent event) throws IOException {
+        String countryId = comboCountry.getSelectionModel().getSelectedItem().split(":")[1];
+        String sqlCountryId = "SELECT cityId, city FROM city WHERE countryId =" + countryId;
+
+        try {
+            Statement s = SQLConnector.getCon().createStatement();
+            ResultSet rs = s.executeQuery(sqlCountryId);
+            comboCity.getItems().clear();
+            while (rs.next()) {
+                comboCity.getItems().add(rs.getString("city") + ":" + rs.getString("cityId"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(CustomerManagerController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private Boolean isValid() {
+        String msg = "";
+        Boolean valid = false;
+
+        if (txtCustomerName == null) {
+            msg += ("Name requires input\n");
+        }
+
+        if (txtAddress == null) {
+            msg += ("Address requires input\n");
+        }
+
+        if (comboCountry == null) {
+            msg += ("Country requires input\n");
+        }
+
+        if (comboCity == null) {
+            msg += ("City requires input\n");
+        }
+
+        if (txtZip == null) {
+            msg += ("Zip Code requires input\n");
+        }
+
+        if (txtPhone == null) {
+            msg += ("Phone requires input\n");
+        }
+
+        if (msg.length() < 0) {
+            msg += ("\nPlease fix the listed errors and save again");
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error: Missing required data");
+            alert.setContentText("You must provide information for all fields.");
+            alert.showAndWait();
+        } else {
+            valid = true;
+        }
+        return valid;
     }
 }
+
+
+

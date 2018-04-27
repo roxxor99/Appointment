@@ -1,7 +1,5 @@
 package testrun;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -10,17 +8,17 @@ import javafx.beans.property.StringProperty;
  * @author Jed Gunderson
  */
 public class Customer {
-    private IntegerProperty customerId = new SimpleIntegerProperty();
+    private StringProperty customerId = new SimpleStringProperty();
     private StringProperty customerName = new SimpleStringProperty();
-    private IntegerProperty isActive = new SimpleIntegerProperty();
-    private IntegerProperty addressId = new SimpleIntegerProperty();
+    private StringProperty isActive = new SimpleStringProperty();
+    private StringProperty addressId = new SimpleStringProperty();
     private StringProperty address = new SimpleStringProperty();
     //private StringProperty address2 = new SimpleStringProperty();
     private StringProperty postalCode = new SimpleStringProperty();
     private StringProperty phone = new SimpleStringProperty();
-    private IntegerProperty countryId = new SimpleIntegerProperty();
+    private StringProperty countryId = new SimpleStringProperty();
     private StringProperty country = new SimpleStringProperty();
-    private IntegerProperty cityId = new SimpleIntegerProperty();
+    private StringProperty cityId = new SimpleStringProperty();
     private StringProperty city = new SimpleStringProperty();
     /**
      * Constructor
@@ -28,7 +26,7 @@ public class Customer {
     public Customer() {
     }
 
-    public IntegerProperty getCustomerId() {
+    public StringProperty getCustomerId() {
         return this.customerId;
     }
 
@@ -36,11 +34,11 @@ public class Customer {
         return this.customerName;
     }
 
-    public IntegerProperty getIsActive() {
+    public StringProperty getIsActive() {
         return this.isActive;
     }
     
-    public IntegerProperty getAddressId() {
+    public StringProperty getAddressId() {
         return this.addressId;
     }
     
@@ -60,7 +58,7 @@ public class Customer {
         return this.phone;
     }
     
-    public IntegerProperty getCountryId() {
+    public StringProperty getCountryId() {
         return this.countryId;
     }
 
@@ -68,7 +66,7 @@ public class Customer {
         return this.country;
     }
     
-    public IntegerProperty getCityId() {
+    public StringProperty getCityId() {
         return this.cityId;
     }
     
@@ -77,7 +75,7 @@ public class Customer {
     }
 
     //Setters
-    public void setCustomerId(int customerId) {
+    public void setCustomerId(String customerId) {
         this.customerId.set(customerId);
     }
 
@@ -85,11 +83,11 @@ public class Customer {
         this.customerName.set(customerName);
     }
 
-    public void setIsActive(int isActive) {
+    public void setIsActive(String isActive) {
         this.isActive.set(isActive);
     }
 
-     public void setAddressId (int addressId) {
+     public void setAddressId (String addressId) {
         this.addressId.set(addressId);
     }
     
@@ -109,7 +107,7 @@ public class Customer {
         this.phone.set(phone);
     }
     
-    public void setCountryId(int countryId) {
+    public void setCountryId(String countryId) {
         this.countryId.set(countryId);
     }
 
@@ -117,7 +115,7 @@ public class Customer {
         this.country.set(country);
     }
     
-    public void setCityId(int cityId) {
+    public void setCityId(String cityId) {
         this.cityId.set(cityId);
     }
     

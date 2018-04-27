@@ -7,20 +7,15 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import static java.time.LocalDateTime.now;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Optional;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -34,8 +29,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.collections.ObservableList;
-import javafx.scene.input.MouseEvent;
 import static testrun.MainLandingController.apptList;
 import static testrun.MainLandingController.setApptList;
 import static testrun.SQLConnector.executeQuery;
@@ -148,7 +141,7 @@ public class AppointmentManagerController {
         } catch (SQLException ex) {
         }
     }
-
+//none of these onAction methods are needed and can be removed by deleting below AND from AppointmentManager.fxml.
     @FXML
     private void customerNameAction(ActionEvent event) throws SQLException, IOException {
     }
@@ -176,11 +169,15 @@ public class AppointmentManagerController {
     @FXML
     private void endMinuteAction(ActionEvent event) {
     }
-
+//end delete
+    
     @FXML
     private void saveAction(ActionEvent event) throws SQLException, IOException {
         String[] parts = comboCustomerName.getSelectionModel().getSelectedItem().split(":");
         String customerName = parts[0];
+        String customerId = parts[1];
+        Integer appointmentId = null;
+        
         String type = comboType.getSelectionModel().getSelectedItem();
         String createdBy = txtCreatedBy.getText();
         String location = comboLocation.getSelectionModel().getSelectedItem();
@@ -189,11 +186,9 @@ public class AppointmentManagerController {
         String startMinute = comboStartMinute.getSelectionModel().getSelectedItem();
         String endHour = comboEndHour.getSelectionModel().getSelectedItem();
         String endMinute = comboEndMinute.getSelectionModel().getSelectedItem();
-        Integer appointmentId = null;
-        String customerId = parts[1];
+        
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedString = date.format(formatter);
-
         Timestamp updateStartTime = dateFormatter(formattedString + " " + startHour + ":" + startMinute + ":00.0");
         Timestamp updateEndTime = dateFormatter(formattedString + " " + endHour + ":" + endMinute + ":00.0");
 
@@ -232,18 +227,15 @@ public class AppointmentManagerController {
                 appointmentId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getAppointmentId().getValue();
 //                customerId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue().toString();
                 
-                String sqlAppointmentUpdate = "UPDATE appointment SET (customerId, title, description, location, contact, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy, WHERE appointmentId =?)"
-                        + "VALUES (?, ?, '', ?, '', '', ?, ?, now(), ?, now(), ?);";
+                String sqlAppointmentUpdate = "UPDATE appointment SET title =?, location = ?,start =?, end=?, lastUpdate=now(), lastUpdateBy=? "
+                        + "WHERE appointmentId =?";
                 PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAppointmentUpdate);
-                statement.setString(1, customerId);
-                statement.setString(2, type);
-                statement.setString(3, location);
-                statement.setTimestamp(4, updateStartTime);
-                statement.setTimestamp(5, updateEndTime);
-                statement.setString(6, createdBy);
-                statement.setString(7, createdBy);
-                statement.setInt(8, appointmentId );
-                //statement.setInt(8, tableCurrentSchedule.getSelectionModel().getSelectedItem().getAppointmentId().getValue());
+                statement.setString(1, type);
+                statement.setString(2, location);
+                statement.setTimestamp(3, updateStartTime);
+                statement.setTimestamp(4, updateEndTime);
+                statement.setString(5, LoginController.getLoggedInUser());
+                statement.setString(6, LoginController.getLoggedInUser());
 
                 //Use executeUpdate(INSERT/MOD/DELETE) instead of executeQuery(Query the data)
                 int rowsInserted = statement.executeUpdate();
@@ -257,7 +249,7 @@ public class AppointmentManagerController {
             Logger.getLogger(AppointmentManagerController.class.getName()).log(Level.SEVERE, null, ex);
         }
         //refreshes the table and DB data when true
-        tableData(true);
+        tableData(false);
     }
 
     @FXML
@@ -270,7 +262,7 @@ public class AppointmentManagerController {
         //date conversion
         String startDate = tableCurrentSchedule.getSelectionModel().getSelectedItem().getStartTime().getValue();
         String endDate = tableCurrentSchedule.getSelectionModel().getSelectedItem().getEndTime().getValue();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"); //use kk instead of HH? k is 24 hour
         LocalDate currentDate = LocalDate.parse(startDate, formatter);
         datePicker.setValue(currentDate);
 
@@ -341,23 +333,31 @@ public class AppointmentManagerController {
             stage.show();
         }
     }
-
-    private Timestamp dateFormatter(String catDate) {
+    
+    //convert to UTC datetime
+    public static Timestamp dateFormatter(String catDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
         LocalDateTime localDT = LocalDateTime.parse(catDate, formatter);
+        
         ZoneId zid = ZoneId.systemDefault();
         ZonedDateTime zDateTime = localDT.atZone(zid);
         ZonedDateTime utcStart = zDateTime.withZoneSameInstant(ZoneId.of("UTC"));
         localDT = utcStart.toLocalDateTime();
         //Create Timestamp values from Instants to update database
-        Timestamp startsqlts = Timestamp.valueOf(localDT);
-        return startsqlts;
+        Timestamp startSQLts = Timestamp.valueOf(localDT);
+        return startSQLts;
+    }
+    
+    public static ZonedDateTime utcToLocal(Timestamp datetime) {
+        ZoneId zid = ZoneId.systemDefault();
+        ZonedDateTime zDateTime = datetime.toLocalDateTime().atZone(ZoneId.of("UTC"));
+        ZonedDateTime localStart = zDateTime.withZoneSameInstant(zid);
+        return localStart;
     }
         
     private void tableData(Boolean updateRefresh) throws SQLException, IOException {
         if (updateRefresh) {
             setApptList(databaseAppointments());
-
         }
         columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
         columnCreatedByCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
@@ -371,4 +371,16 @@ public class AppointmentManagerController {
         apptList = MainLandingController.getApptList();
         tableCurrentSchedule.setItems(apptList);
     }
+    
+//    private Boolean isValid(){
+//        String title;
+//        Customer customer;
+//        
+//        if(title == null || title.isEmpty()) {
+//            errorMessage += ("Title cannot be blank\n");
+//        }
+//    }
+    
+    
+    
 }

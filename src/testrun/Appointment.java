@@ -22,8 +22,6 @@ public class Appointment {
     private StringProperty startTime = new SimpleStringProperty();
     private StringProperty endTime = new SimpleStringProperty();
     private StringProperty createdBy = new SimpleStringProperty();
-    
-    //I think I need these 3 in order to save to the database in AppointmentManagerController.java saveAction() method
     private StringProperty createDate = new SimpleStringProperty();
     private StringProperty lastUpdate = new SimpleStringProperty();
     private StringProperty lastUpdateBy = new SimpleStringProperty();

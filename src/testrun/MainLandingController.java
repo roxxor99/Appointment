@@ -1,4 +1,3 @@
-
 //    private void populateAptTable(boolean isMonth) throws ParseException {
 //        // Assign data to columns in =>tableMainCurrentSchedule
 //        LocalDate now = LocalDate.now();
@@ -45,14 +44,15 @@
 //                }
 //            }
 //        }
-
 package testrun;
 
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import static java.time.LocalDateTime.now;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import javafx.collections.ObservableList;
@@ -72,7 +72,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-//import testrun.App.writeToLog;
+import static testrun.SQLConnector.executeQuery;
+import static testrun.SQLConnectorData.databaseAppointments;
 
 /**
  * FXML Controller class
@@ -116,14 +117,17 @@ public class MainLandingController {
     private Button butExit;
     static ObservableList<Appointment> apptList;
     private boolean isMonth;
-    
+
     /**
      * Initializes the controller class.
+     *
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
     //@Override
     public void initialize() throws SQLException, IOException {
+//        tableData();
+        
         // Assign data to columns in =>tableMainCurrentSchedule
         columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
         columnCreatedByCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
@@ -197,12 +201,12 @@ public class MainLandingController {
         stage.setScene(scene);
         stage.show();
     }
-    
+
     @FXML
     void logAction(ActionEvent event) throws IOException {
-        Runtime.getRuntime().exec("explorer.exe /select,C:\\C195_LogFile\\log.txt");    
+        Runtime.getRuntime().exec("explorer.exe /select,C:\\C195_LogFile\\log.txt");
     }
-    
+
     @FXML
     private void exitAction(ActionEvent event) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -216,13 +220,63 @@ public class MainLandingController {
         }
     }
 
+    public static void upcomingAppointmentAlert() throws SQLException, IOException {
+        LocalDateTime ldt = now();
+        LocalDateTime ldtPlusFifteen = now().plusMinutes(15);
+        
+        String appointmentAlert = "SELECT customerName, title, Date(start) as theDate, Time(start) as theStartTime, Time(end) as theEndTime FROM appointment"
+                + "INNER JOIN customer ON appointment.customerid=customer.customerId"
+                + "WHERE start >= now()"
+                + "ORDER BY start DESC;";
+//             ResultSet rs = executeQuery(appointmentAlert, x -> executeQuery(x));
+
+//not sure how to do the check within 15min of now()
+//if (appointmentAlert)
+//                if(zoneStart <= ldtPlusFifteen)
+        
+        ResultSet rs = executeQuery(appointmentAlert);
+        if (rs.isBeforeFirst()) {
+            String alertMSG = "";
+            alertMSG += ("You have appointments that are about to begin");
+            while (rs.next()) {
+                alertMSG += ("\n\n");
+                ZonedDateTime zoneStart = AppointmentManagerController.utcToLocal(rs.getTimestamp("theStartTime"));
+                ZonedDateTime zoneEnd = AppointmentManagerController.utcToLocal(rs.getTimestamp("theEndTime"));
+
+                //Information to supply the alert Type- Time- Customer
+                alertMSG += (rs.getString("title") + "\n");
+                alertMSG += (rs.getString("customerName") + "\n");
+                alertMSG += ("From " + zoneStart.toLocalTime().toString() + " to " + zoneEnd.toLocalTime().toString() + "\n");
+                alertMSG += ("With " + rs.getString("customerName"));
+            }
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Alert");
+            alert.setHeaderText("Upcoming Appointment");
+            alert.setContentText(alertMSG);
+            alert.showAndWait();
+        }
+    }
+    
+//    private void tableData(Boolean updateRefresh) throws SQLException, IOException {
+//        if (updateRefresh) {
+//            setApptList(databaseAppointments());
+//        }
+//        columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
+//        columnCreatedByCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
+//        columnTypeCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getTitle());
+//        columnLocationCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getLocation());
+//        columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
+//        columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
+//
+//        apptList = getApptList();
+//        tableMainCurrentSchedule.setItems(apptList);
+//    }
+    
     public static ObservableList<Appointment> getApptList() {
         return apptList;
     }
 
     public static void setApptList(ObservableList<Appointment> apptList) {
-        MainLandingController.apptList = apptList;
     }
-    
-    
 }
