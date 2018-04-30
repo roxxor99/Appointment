@@ -115,7 +115,7 @@ public class CustomerManagerController {
             mainScreenStage.show();
 
             if (tableCurrentSchedule.getSelectionModel().isEmpty()) {
-                //insert address first
+                //insert Address
                 String sqlAddressInsert = "INSERT INTO address (address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdate, lastUpdateBy)"
                         + "VALUES (?,'', ?, ?, ?, now(), ?, now(), ?)";
                 PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAddressInsert);
@@ -125,8 +125,13 @@ public class CustomerManagerController {
                 statement.setString(4, phone);
                 statement.setString(5, LoginController.getLoggedInUser());
                 statement.setString(6, LoginController.getLoggedInUser());
-
-                //insert customer second
+                
+                int rowsInserted = statement.executeUpdate();
+                if (rowsInserted > 0) {
+                    System.out.println("A new address was inserted successfully!");
+                }
+                
+                //insert Customer 
                 String sqlCustomerInsert = "INSERT INTO customer (customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy)"
                         + "VALUES (?, LAST_INSERT_ID(), 0, now(), ?, now(), ?)";
                 statement = SQLConnector.getCon().prepareStatement(sqlCustomerInsert);
@@ -135,15 +140,15 @@ public class CustomerManagerController {
                 statement.setString(3, LoginController.getLoggedInUser());
 
                 //Use executeUpdate instead of executeQuery
-                int rowsInserted = statement.executeUpdate();
+                rowsInserted = statement.executeUpdate();
                 if (rowsInserted > 0) {
-                    System.out.println("A new user was inserted successfully!");
+                    System.out.println("A new customer was inserted successfully!");
                 }
             } else {
                 String customerId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue();
 
                 String sqlAddressUpdate = "UPDATE address SET address=?, cityId=?, postalCode=?, phone=?, lastUpdate=now(), lastUpdateBy=?"
-                        + "WHERE addressId = ?";
+                        + "WHERE addressId =?";
                 PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAddressUpdate);
                 statement.setString(1, address);
                 statement.setString(2, cityId);
@@ -152,7 +157,7 @@ public class CustomerManagerController {
                 statement.setString(5, LoginController.getLoggedInUser());
 
                 String sqlCustomerUpdate = "UPDATE customer SET customerName=?, lastUpdate=now(), lastUpdateBy=?"
-                        + "WHERE customerId=?";
+                        + "WHERE customerId =?";
                 statement = SQLConnector.getCon().prepareStatement(sqlCustomerUpdate);
                 statement.setString(1, customerName);
                 statement.setString(2, LoginController.getLoggedInUser());
@@ -176,9 +181,9 @@ public class CustomerManagerController {
     @FXML
     private void deleteAction(ActionEvent event) throws SQLException, IOException {
         Customer cust = tableCurrentSchedule.getSelectionModel().getSelectedItem();
-
+        
+        // A customer must be selected before it can be removed
         if (cust == null) {
-            // A customer must be selected before it can be removed
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error: No Appointment Selected");
@@ -186,7 +191,7 @@ public class CustomerManagerController {
             alert.showAndWait();
             return;
         }
-
+        
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation");
         alert.setHeaderText("Confirmation Delete Dialog");
@@ -278,7 +283,7 @@ public class CustomerManagerController {
         Boolean valid = false;
 
         if (txtCustomerName == null) {
-            msg += ("Name requires input\n");
+            msg += ("Customer Name requires input\n");
         }
 
         if (txtAddress == null) {

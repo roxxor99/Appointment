@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -44,7 +42,9 @@ public class ReportAptTypeController implements Initializable {
     @FXML
     private TableColumn<ReportAptType, Integer> columnTotal;
     @FXML
-    private TableColumn<ReportAptType, String> columnDate;
+    private TableColumn<ReportAptType, String> columnMonth;
+    @FXML
+    private TableColumn<ReportAptType, String> columnYear;
     @FXML
     private Button butBack;
 
@@ -55,7 +55,8 @@ public class ReportAptTypeController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         columnType.setCellValueFactory(cellData -> cellData.getValue().getTitle());
         columnTotal.setCellValueFactory(cellData -> cellData.getValue().getTotal().asObject());
-        columnDate.setCellValueFactory(cellData -> cellData.getValue().getMonthYear());
+        columnMonth.setCellValueFactory(cellData -> cellData.getValue().getMonth());
+        columnYear.setCellValueFactory(cellData -> cellData.getValue().getYear());
         
         try {
             tableTypeReport.setItems(databaseReportAptType());
@@ -68,22 +69,19 @@ public class ReportAptTypeController implements Initializable {
 
     public static ObservableList<ReportAptType> databaseReportAptType() throws SQLException, IOException {
         ObservableList<ReportAptType> reportAptTypeList = FXCollections.observableArrayList();
-        String typeApts = "SELECT DISTINCT title, Count(appointmentId) AS total, Month(start) as theMonth, Year(start) AS theYear FROM appointment GROUP BY title, Year(start), Month(start) ORDER BY title, Year(start) ASC, Month(start) ASC;";
-//        String typeApts = "SELECT Count(appointmentId) AS total, Month(start) as theMonth, Year(start) AS theYear, title FROM appointment GROUP BY Year(start), Month(start), title ORDER BY Year(start) ASC, Month(start) ASC, title ASC;";
+        String typeApts = "SELECT DISTINCT title, Count(appointmentId) AS total, Month(start) as theMonth, Year(start) AS theYear "
+                + "FROM appointment "
+                + "GROUP BY title, Year(start), Month(start) ORDER BY title, Year(start) ASC, Month(start) ASC;";
         ResultSet rs = executeQuery(typeApts);
 
         while (rs.next()) {
-//            LocalDate month = LocalDate.of(rs.getInt("theYear"), rs.getInt("theMonth"), 1);
-//            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMMM yyyy");
-            
             ReportAptType reportAptType = new ReportAptType();
             reportAptType.setTitle(rs.getString("title"));
             reportAptType.setTotal(rs.getInt("total"));
-//            reportAptType.setMonthYear(rs.getString("monthYear"));
-//            month.format(dtf);
+            reportAptType.setMonth(rs.getString("theMonth"));
+            reportAptType.setYear(rs.getString("theYear"));
             reportAptTypeList.add(reportAptType);
         }
-
         return reportAptTypeList;
     }
 

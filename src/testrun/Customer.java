@@ -45,10 +45,6 @@ public class Customer {
     public StringProperty getAddress() {
         return this.address;
     }
-    
-//    public StringProperty getAddress2() {
-//        return this.address2;
-//    }
   
     public StringProperty getPostalCode() {
         return this.postalCode;
@@ -94,10 +90,6 @@ public class Customer {
     public void setAddress(String address) {
         this.address.set(address);
     }
-    
-//    public void setAddress2(String address2) {
-//        this.address2.set(address2);
-//    }
     
     public void setPostalCode (String postalCode) {
         this.postalCode.set(postalCode);

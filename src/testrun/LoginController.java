@@ -2,15 +2,7 @@ package testrun;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import static java.time.LocalDateTime.now;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,19 +12,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import java.util.Locale;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import static testrun.App.writeToLog;
-import static testrun.SQLConnector.executeQuery;
-//import testrun.App.writeToLog(String);
 
 /**
  * @author Jed Gunderson
@@ -134,7 +119,7 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //Uncomment below to test/verify locale is set to German.
+        //Language change for login in screen
         //Locale.setDefault(new Locale("de", "DE"));
         
         this.currentLocale = Locale.getDefault();
@@ -143,6 +128,5 @@ public class LoginController implements Initializable {
         lblUsername.setText(this.rb.getString("UsernameLabel"));
         lblPassword.setText(this.rb.getString("PasswordLabel"));
         lblTitle.setText(this.rb.getString("Title"));
-
     }
 }

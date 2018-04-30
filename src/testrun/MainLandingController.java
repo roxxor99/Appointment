@@ -116,7 +116,7 @@ public class MainLandingController {
     @FXML
     private Button butExit;
     static ObservableList<Appointment> apptList;
-    private boolean isMonth;
+    //private boolean isMonth;
 
     /**
      * Initializes the controller class.
@@ -127,7 +127,8 @@ public class MainLandingController {
     //@Override
     public void initialize() throws SQLException, IOException {
 //        tableData();
-        
+//        upcomingAppointmentAlert();
+
         // Assign data to columns in =>tableMainCurrentSchedule
         columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
         columnCreatedByCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
@@ -137,6 +138,7 @@ public class MainLandingController {
         columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
         apptList = SQLConnectorData.databaseAppointments();
         tableMainCurrentSchedule.setItems(apptList);
+        
     }
 
     //Calendar by month radio
@@ -145,7 +147,7 @@ public class MainLandingController {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime nowPlus1 = now.plusMonths(1);
         FilteredList<Appointment> filteredData = new FilteredList<>(apptList);
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
         //set predicate will match the elements that will be in the FilteredList
         filteredData.setPredicate(row -> {
             LocalDateTime rowDate = LocalDateTime.parse(row.getStartTime().getValue(), df);
@@ -160,7 +162,7 @@ public class MainLandingController {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime nowPlus7 = now.plusDays(7);
         FilteredList<Appointment> filteredData = new FilteredList<>(apptList);
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
         //set predicate will match the elements that will be in the FilteredList
         filteredData.setPredicate(row -> {
             LocalDateTime rowDate = LocalDateTime.parse(row.getStartTime().getValue(), df);
@@ -220,19 +222,33 @@ public class MainLandingController {
         }
     }
 
+//    public static Boolean upcoming AppointmentAlert(LocalDateTime X){
     public static void upcomingAppointmentAlert() throws SQLException, IOException {
-        LocalDateTime ldt = now();
-        LocalDateTime ldtPlusFifteen = now().plusMinutes(15);
-        
-        String appointmentAlert = "SELECT customerName, title, Date(start) as theDate, Time(start) as theStartTime, Time(end) as theEndTime FROM appointment"
-                + "INNER JOIN customer ON appointment.customerid=customer.customerId"
-                + "WHERE start >= now()"
-                + "ORDER BY start DESC;";
-//             ResultSet rs = executeQuery(appointmentAlert, x -> executeQuery(x));
+//        Boolean aptInFifteen = false;
+//        LocalDateTime ldt = now();
+        LocalDateTime ldtPlusFifteenCurrent = now().plusMinutes(15);
+        //Converting LocalDateTime to UTC String yyyy-MM-dd kk:mm:ss.S
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
+        String formattedDate = (ldtPlusFifteenCurrent).format(dtf);
+        String tcformattedDate = AppointmentManagerController.timeConversions(formattedDate).toString();
 
-//not sure how to do the check within 15min of now()
-//if (appointmentAlert)
-//                if(zoneStart <= ldtPlusFifteen)
+        System.out.println("UTC date in format 'yyyy-MM-dd kk:mm:ss.S': " + formattedDate);
+
+        //        if()
+        //               tcformattedDate <= ldtPlusFifteenCurrent
+
+//        //Only returns future appointments from now().
+//        String appointmentAlert = "SELECT customerName, title, Date(start) as theDate, Time(start) as theStartTime, Time(end) as theEndTime FROM appointment"
+//                + "INNER JOIN customer ON appointment.customerid=customer.customerId"
+//                + "WHERE start >= now()"
+//                + "ORDER BY start DESC;";
+
+        String appointmentAlert = "SELECT customerName, title, start, end "
+                + "FROM appointment"
+                + "INNER JOIN customer ON appointment.customerid=customer.customerId"
+                + "WHERE start <= " + tcformattedDate
+//                + "AND lastUpdateBy = " + LoginController.getLoggedInUser()
+                + "ORDER BY appointment.start DESC;";
         
         ResultSet rs = executeQuery(appointmentAlert);
         if (rs.isBeforeFirst()) {
@@ -249,7 +265,6 @@ public class MainLandingController {
                 alertMSG += ("From " + zoneStart.toLocalTime().toString() + " to " + zoneEnd.toLocalTime().toString() + "\n");
                 alertMSG += ("With " + rs.getString("customerName"));
             }
-
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Alert");
             alert.setHeaderText("Upcoming Appointment");
@@ -257,7 +272,7 @@ public class MainLandingController {
             alert.showAndWait();
         }
     }
-    
+
 //    private void tableData(Boolean updateRefresh) throws SQLException, IOException {
 //        if (updateRefresh) {
 //            setApptList(databaseAppointments());

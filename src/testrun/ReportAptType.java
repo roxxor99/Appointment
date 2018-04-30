@@ -10,8 +10,8 @@ import javafx.beans.property.StringProperty;
  * @author Jed Gunderson
  */
 public class ReportAptType {
-
-    private StringProperty monthYear = new SimpleStringProperty();
+    private StringProperty month = new SimpleStringProperty();
+    private StringProperty year = new SimpleStringProperty();
     private StringProperty title = new SimpleStringProperty();
     private IntegerProperty total = new SimpleIntegerProperty();
 
@@ -19,8 +19,11 @@ public class ReportAptType {
     }
 
     //Getters
-    public StringProperty getMonthYear() {
-        return this.monthYear;
+    public StringProperty getMonth() {
+        return this.month;
+    }
+    public StringProperty getYear() {
+        return this.year;
     }
 
     public StringProperty getTitle() {
@@ -32,10 +35,14 @@ public class ReportAptType {
     }
 
     //Setters
-    public void setMonthYear(String monthYear) {
-        this.monthYear.set(monthYear);
+    public void setMonth(String month) {
+        this.month.set(month);
     }
-
+    
+    public void setYear(String year) {
+        this.year.set(year);
+    }
+    
     public void setTitle(String title) {
         this.title.set(title);
     }

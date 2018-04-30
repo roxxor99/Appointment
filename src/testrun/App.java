@@ -21,10 +21,9 @@ public class App extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+    
     //If folder does not exist.. make it. 
-    //Write file utilizing line sep.
     //Format used: date:Time(24hour): Message
-    //call in LoginController
     public static void writeToLog(String message) {
         String filename = "log.txt";
         String path = "C:\\C195_LogFile\\";
@@ -51,10 +50,8 @@ public class App extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
     /**
      * @param args the command line arguments
      */
-
 }

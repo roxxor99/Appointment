@@ -14,7 +14,8 @@ public class SQLConnectorData extends SQLConnector {
 
     public static ObservableList<Appointment> databaseAppointments() throws SQLException, IOException {
         ObservableList<Appointment> appointmentList = FXCollections.observableArrayList();
-        String sqlQuery = "SELECT * FROM appointment INNER JOIN customer ON appointment.customerid=customer.customerId;";
+        String sqlQuery = "SELECT * FROM appointment "
+                + "INNER JOIN customer ON appointment.customerid=customer.customerId;";
 
         ResultSet queryResult = executeQuery(sqlQuery);
         while (queryResult.next()) {
@@ -40,7 +41,11 @@ public class SQLConnectorData extends SQLConnector {
 
     public static ObservableList<Customer> databaseCustomer() throws SQLException, IOException {
         ObservableList<Customer> customerList = FXCollections.observableArrayList();
-        String sqlQuery = "SELECT * FROM customer INNER JOIN address ON customer.addressId=address.addressId INNER JOIN city ON address.cityId=city.cityId INNER JOIN country ON city.countryId=country.countryId;";
+        String sqlQuery = "SELECT * FROM customer "
+                + "INNER JOIN address ON customer.addressId=address.addressId "
+                + "INNER JOIN city ON address.cityId=city.cityId "
+                + "INNER JOIN country ON city.countryId=country.countryId;";
+        
         ResultSet queryResult = executeQuery(sqlQuery);
         while (queryResult.next()) {
             Customer customer = new Customer();

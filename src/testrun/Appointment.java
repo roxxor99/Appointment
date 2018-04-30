@@ -1,5 +1,9 @@
 package testrun;
 
+import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -25,12 +29,6 @@ public class Appointment {
     private StringProperty createDate = new SimpleStringProperty();
     private StringProperty lastUpdate = new SimpleStringProperty();
     private StringProperty lastUpdateBy = new SimpleStringProperty();
-    
-//    private Date startDate;
-//    private Date endDate;
-//    private StringProperty dateTxt = new SimpleStringProperty();
-//    private StringProperty startTxt = new SimpleStringProperty();
-//    private StringProperty endTxt = new SimpleStringProperty();
 
     public Appointment() {
     }
@@ -50,7 +48,6 @@ public class Appointment {
 
     public StringProperty getTitle() {
         return this.title;
-
     }
 
     public StringProperty getContact() {
@@ -81,34 +78,21 @@ public class Appointment {
         return this.endTime;
     }
 
-//    public Date getStartDate() {
-//        return this.startDate;
-//    }
-
-//    public Date getEndDate() {
-//        return this.endDate;
-//    }
-    
     public StringProperty getCreatedBy() {
         return this.createdBy;
-
     }
-    
+
     public StringProperty createDate() {
         return this.createDate;
-
     }
-    
+
     public StringProperty lastUpdate() {
         return this.lastUpdate;
-
     }
-    
+
     public StringProperty lastUpdateBy() {
         return this.lastUpdateBy;
-
     }
-    
 
     //Setters
     public void setAppointmentId(int appointmentId) {
@@ -144,35 +128,46 @@ public class Appointment {
     }
 
     public void setStartTime(String startTime) {
-        this.startTime.set(startTime);
+        this.startTime.set(utcToLocal(startTime));
     }
 
     public void setEndTime(String endTime) {
-        this.endTime.set(endTime);
+        this.endTime.set(utcToLocal(endTime));
     }
 
-//    public void setStartDate(Date startDate) {
-//        this.startDate = startDate;
-//    }
-//
-//    public void setEndDate(Date endDate) {
-//        this.endDate = endDate;
-//    }
-    
     public void setCreatedBy(String createdBy) {
         this.createdBy.set(createdBy);
     }
-    
+
     public void setCreateDate(String createDate) {
         this.createDate.set(createDate);
     }
-    
+
     public void setLastUpdate(String lastUpdate) {
         this.lastUpdate.set(lastUpdate);
     }
-    
+
     public void setLastUpdateBy(String lastUpdateBy) {
         this.lastUpdateBy.set(lastUpdateBy);
     }
-    
+
+    public static String utcToLocal(String catDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
+        Timestamp ts = Timestamp.valueOf(catDate);
+        ZoneId newzid = ZoneId.systemDefault();
+        ZonedDateTime newzdtStart = ts.toLocalDateTime().atZone(ZoneId.of("UTC"));
+        ZonedDateTime newLocalStart = newzdtStart.withZoneSameInstant(newzid);
+        String testDelete = newLocalStart.format(formatter);
+        return newLocalStart.format(formatter);
+
+        
+//        LocalDateTime dateTime = LocalDateTime.parse(catDate, formatter);
+//        ZoneId zid = ZoneId.systemDefault();
+//        ZonedDateTime zDateTime = dateTime.atZone(zid);
+////        zDateTime.withZoneSameInstant(ZoneId.of("UTC"));
+//        ZonedDateTime localStart = zDateTime.withZoneSameInstant(zid);
+//
+//        String currentTime = localStart.format(formatter);
+//        return localStart.format(formatter);
+    }
 }
