@@ -1,55 +1,10 @@
-//    private void populateAptTable(boolean isMonth) throws ParseException {
-//        // Assign data to columns in =>tableMainCurrentSchedule
-//        LocalDate now = LocalDate.now();
-//        ObservableList<Appointment> filteredList = FXCollections.observableArrayList();
-//        for (Appointment appointment:apptList)
-//        {
-//            Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2014-10-14 03:05:39");//(appointment.getStartTime().getValue());
-//            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-////            String utcTime = appointment.getStartTime().getValue();
-////            DateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-////            utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-////            Date utcDate = utcFormat.parse(utcTime);
-////            LocalDate dateParsed = LocalDate.parse(dateTimeFormatter.format((TemporalAccessor) utcDate), dateTimeFormatter);
-//            
-//            
-////            String check = appointment.getStartTime().getValue();
-////            LocalDate test = LocalDate.parse(check);
-////            String utcTime = appointment.getStartTime().getValue();
-////            DateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-////            utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-//            
-////         String utcTimeString = "2014-10-14 03:05:39";
-////         DateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-////         utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-////         Date utcTime = utcFormat.parse(utcTimeString);
-////
-////
-////         DateFormat localFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-////         localFormat.setTimeZone(TimeZone.getDefault());
-////         System.out.println("Local: " + localFormat.format(utcTime));
-//         
-//            LocalDate currentApt = LocalDate.parse(appointment.getStartTime().toString());
-//            //LocalDate currentApt = LocalDate.parse(date);
-////            LocalDate.parse(dateTimeFormatter.format(date), dateTimeFormatter);
-//            if(isMonth) {
-//               if(currentApt.getMonth() == now.getMonth()){
-//                   filteredList.add(appointment);
-//               }
-//            }
-//            else{
-//                LocalDate week = now.plusDays(7);
-//                if(currentApt.isAfter(now) && currentApt.isBefore(week)) {
-//                    filteredList.add(appointment);
-//                }
-//            }
-//        }
 package testrun;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import static java.time.LocalDateTime.now;
 import java.time.ZonedDateTime;
@@ -115,8 +70,7 @@ public class MainLandingController {
     private Button butLog;
     @FXML
     private Button butExit;
-    static ObservableList<Appointment> apptList;
-    //private boolean isMonth;
+    private static ObservableList<Appointment> apptList;
 
     /**
      * Initializes the controller class.
@@ -126,19 +80,8 @@ public class MainLandingController {
      */
     //@Override
     public void initialize() throws SQLException, IOException {
-//        tableData();
-//        upcomingAppointmentAlert();
-
-        // Assign data to columns in =>tableMainCurrentSchedule
-        columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
-        columnCreatedByCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
-        columnTypeCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getTitle());
-        columnLocationCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getLocation());
-        columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
-        columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
-        apptList = SQLConnectorData.databaseAppointments();
-        tableMainCurrentSchedule.setItems(apptList);
-        
+        tableData(true);
+        upcomingAppointmentAlert();
     }
 
     //Calendar by month radio
@@ -222,76 +165,74 @@ public class MainLandingController {
         }
     }
 
-//    public static Boolean upcoming AppointmentAlert(LocalDateTime X){
     public static void upcomingAppointmentAlert() throws SQLException, IOException {
-//        Boolean aptInFifteen = false;
-//        LocalDateTime ldt = now();
         LocalDateTime ldtPlusFifteenCurrent = now().plusMinutes(15);
-        //Converting LocalDateTime to UTC String yyyy-MM-dd kk:mm:ss.S
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
         String formattedDate = (ldtPlusFifteenCurrent).format(dtf);
-        String tcformattedDate = AppointmentManagerController.timeConversions(formattedDate).toString();
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss.S");
+//        String tcformattedDate = sdf.format(AppointmentManagerController.timeConversions(formattedDate));
 
-        System.out.println("UTC date in format 'yyyy-MM-dd kk:mm:ss.S': " + formattedDate);
+//        String logCon = LoginController.getLoggedInUser();
+//        String appointmentAlert = "SELECT customer.customerName, appointment.title, appointment.start, appointment.end, appointment.lastUpdateBy "
+//                + "FROM appointment "
+//                + "INNER JOIN customer ON appointment.customerid=customer.customerId "
+//                + "WHERE appointment.start <= " + "'" + tcformattedDate + "' "
+//                + "AND appointment.lastUpdateBy = " + "\"" + logCon + "\" "
+//                + "ORDER BY appointment.start DESC;";
 
-        //        if()
-        //               tcformattedDate <= ldtPlusFifteenCurrent
+        String appointmentAlert = ("SELECT start, customerName  "
+                + "FROM appointment a, customer c "
+                + "WHERE c.customerId = a.customerId "
+                + "AND start BETWEEN now() AND date_add(now(), interval 15 minute) ");
 
-//        //Only returns future appointments from now().
-//        String appointmentAlert = "SELECT customerName, title, Date(start) as theDate, Time(start) as theStartTime, Time(end) as theEndTime FROM appointment"
-//                + "INNER JOIN customer ON appointment.customerid=customer.customerId"
-//                + "WHERE start >= now()"
-//                + "ORDER BY start DESC;";
-
-        String appointmentAlert = "SELECT customerName, title, start, end "
-                + "FROM appointment"
-                + "INNER JOIN customer ON appointment.customerid=customer.customerId"
-                + "WHERE start <= " + tcformattedDate
-//                + "AND lastUpdateBy = " + LoginController.getLoggedInUser()
-                + "ORDER BY appointment.start DESC;";
         
+//!!Need to convert rs.getString(1) to localtime currently displaying UTC (+6hrs)
         ResultSet rs = executeQuery(appointmentAlert);
-        if (rs.isBeforeFirst()) {
-            String alertMSG = "";
-            alertMSG += ("You have appointments that are about to begin");
-            while (rs.next()) {
-                alertMSG += ("\n\n");
-                ZonedDateTime zoneStart = AppointmentManagerController.utcToLocal(rs.getTimestamp("theStartTime"));
-                ZonedDateTime zoneEnd = AppointmentManagerController.utcToLocal(rs.getTimestamp("theEndTime"));
-
-                //Information to supply the alert Type- Time- Customer
-                alertMSG += (rs.getString("title") + "\n");
-                alertMSG += (rs.getString("customerName") + "\n");
-                alertMSG += ("From " + zoneStart.toLocalTime().toString() + " to " + zoneEnd.toLocalTime().toString() + "\n");
-                alertMSG += ("With " + rs.getString("customerName"));
-            }
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Alert");
-            alert.setHeaderText("Upcoming Appointment");
-            alert.setContentText(alertMSG);
-            alert.showAndWait();
+        boolean hasAppt = false;
+        StringBuffer sb = new StringBuffer("You have appointment(s) within 15 minutes: \n");
+        
+        if (rs.next()) {
+            hasAppt = true;
+            sb.append(rs.getString(2) + " at " + rs.getString(1) + "\n");
         }
-    }
+        if (hasAppt) {
+            Alert a = new Alert(Alert.AlertType.INFORMATION, sb.toString(), ButtonType.OK);
+            a.showAndWait();
+        }
 
-//    private void tableData(Boolean updateRefresh) throws SQLException, IOException {
-//        if (updateRefresh) {
-//            setApptList(databaseAppointments());
-//        }
-//        columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
-//        columnCreatedByCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
-//        columnTypeCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getTitle());
-//        columnLocationCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getLocation());
-//        columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
-//        columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
+//        if (!rs.isBeforeFirst()) {
+//            String alertMSG = "";
+//            alertMSG += ("You have appointments that are about to begin");
+//            while (rs.next()) {
+//                alertMSG += ("\n\n");
+//                ZonedDateTime zoneStart = AppointmentManagerController.utcToLocal(rs.getTimestamp("theStartTime"));
+//                ZonedDateTime zoneEnd = AppointmentManagerController.utcToLocal(rs.getTimestamp("theEndTime"));
 //
-//        apptList = getApptList();
-//        tableMainCurrentSchedule.setItems(apptList);
-//    }
-    
-    public static ObservableList<Appointment> getApptList() {
-        return apptList;
+//                //Information to supply the alert Type- Time- Customer
+//                alertMSG += (rs.getString("title") + "\n");
+//                alertMSG += (rs.getString("customerName") + "\n");
+//                alertMSG += ("From " + zoneStart.toLocalTime().toString() + " to " + zoneEnd.toLocalTime().toString() + "\n");
+//                alertMSG += ("With " + rs.getString("customerName"));
+//            }
+//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//            alert.setTitle("Alert");
+//            alert.setHeaderText("Upcoming Appointment");
+//            alert.setContentText(alertMSG);
+//            alert.showAndWait();
+//        }
     }
 
-    public static void setApptList(ObservableList<Appointment> apptList) {
+    private void tableData(Boolean updateRefresh) throws SQLException, IOException {
+        if (updateRefresh) {
+            apptList = databaseAppointments();
+        }
+        columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
+        columnCreatedByCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
+        columnTypeCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getTitle());
+        columnLocationCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getLocation());
+        columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
+        columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
+
+        tableMainCurrentSchedule.setItems(apptList);
     }
 }

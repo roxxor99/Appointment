@@ -98,6 +98,10 @@ public class CustomerManagerController {
 
     @FXML
     private void saveAction(ActionEvent event) throws SQLException, IOException {
+        if(!isValid()){
+        return;    
+        }
+        
         String customerName = txtCustomerName.getText();
         String address = txtAddress.getText();
         String country = comboCountry.getSelectionModel().getSelectedItem();
@@ -281,38 +285,37 @@ public class CustomerManagerController {
     private Boolean isValid() {
         String msg = "";
         Boolean valid = false;
-
-        if (txtCustomerName == null) {
+        if (txtCustomerName.getText() == null || txtCustomerName.getText().trim().isEmpty()) {
             msg += ("Customer Name requires input\n");
         }
 
-        if (txtAddress == null) {
+        if (txtAddress.getText() == null || txtAddress.getText().trim().isEmpty()) {
             msg += ("Address requires input\n");
         }
 
-        if (comboCountry == null) {
+        if (comboCountry.getSelectionModel().isEmpty()) {
             msg += ("Country requires input\n");
         }
 
-        if (comboCity == null) {
+        if (comboCity.getSelectionModel().isEmpty()) {
             msg += ("City requires input\n");
         }
 
-        if (txtZip == null) {
+        if (txtZip.getText() == null || txtZip.getText().trim().isEmpty()) {
             msg += ("Zip Code requires input\n");
         }
 
-        if (txtPhone == null) {
+        if (txtPhone.getText() == null || txtPhone.getText().trim().isEmpty()) {
             msg += ("Phone requires input\n");
         }
 
-        if (msg.length() < 0) {
+        if (msg.length() > 0) {
             msg += ("\nPlease fix the listed errors and save again");
 
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error: Missing required data");
-            alert.setContentText("You must provide information for all fields.");
+            alert.setContentText(msg);
             alert.showAndWait();
         } else {
             valid = true;

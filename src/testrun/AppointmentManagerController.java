@@ -7,12 +7,14 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,8 +31,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import static testrun.MainLandingController.apptList;
-import static testrun.MainLandingController.setApptList;
 import static testrun.SQLConnector.executeQuery;
 import static testrun.SQLConnectorData.databaseAppointments;
 
@@ -39,7 +39,6 @@ import static testrun.SQLConnectorData.databaseAppointments;
  *
  * @author Jed Gunderson
  */
-//public class AppointmentManagerController implements Initializable {
 public class AppointmentManagerController {
 
     @FXML
@@ -98,6 +97,7 @@ public class AppointmentManagerController {
     private TableColumn<Appointment, Number> columnAppIdCurrentSchedule;
     @FXML
     private TableColumn<Appointment, Number> columnCusIdCurrentSchedule;
+    private static ObservableList<Appointment> apptList;
 
     /**
      * Initializes the controller class.
@@ -105,7 +105,7 @@ public class AppointmentManagerController {
 //    @Override
     public void initialize() throws SQLException, IOException {
         // Assign data to columns in =>tableCurrentSchedule
-        tableData(false);
+        tableData(true);
 
         //comboLocation : create the combobox choices
         comboLocation.getItems().add("New York, New York");
@@ -174,6 +174,11 @@ public class AppointmentManagerController {
 
     @FXML
     private void saveAction(ActionEvent event) throws SQLException, IOException {
+        //appointment exception
+//        if(!isValid()){
+//        return;    
+//        }
+
         String[] parts = comboCustomerName.getSelectionModel().getSelectedItem().split(":");
         String customerName = parts[0];
         String customerId = parts[1];
@@ -193,7 +198,6 @@ public class AppointmentManagerController {
 
         Timestamp updateStartTime = timeConversions(formattedString + " " + startHour + ":" + startMinute + ":00.0");
         Timestamp updateEndTime = timeConversions(formattedString + " " + endHour + ":" + endMinute + ":00.0");
-
 
         try {
             Parent mainScreenParent = FXMLLoader.load(getClass().getResource("MainLanding.fxml"));
@@ -250,8 +254,8 @@ public class AppointmentManagerController {
     @FXML
     private void modifyAction(ActionEvent event) {
         //concat customerName:customerId
-        comboCustomerName.setValue(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerName().getValue()+ ":" 
-                +tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue());
+        comboCustomerName.setValue(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerName().getValue() + ":"
+                + tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue());
         comboType.setValue(tableCurrentSchedule.getSelectionModel().getSelectedItem().getTitle().getValue());
         txtCreatedBy.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCreatedBy().getValue());
         comboLocation.setValue(tableCurrentSchedule.getSelectionModel().getSelectedItem().getLocation().getValue());
@@ -267,16 +271,16 @@ public class AppointmentManagerController {
         //Time Format
         LocalDateTime startTime = LocalDateTime.parse(startDate, formatter);
         LocalDateTime endTime = LocalDateTime.parse(endDate, formatter);
-        
+
         //ternary operator(?= if and := else) to convert from Int(0) to String(00) *int removes the leading 0 
-        comboStartHour.setValue((startTime.getHour()<10)? "0" + Integer.toString(startTime.getHour()): Integer.toString(startTime.getHour()));
-        comboStartMinute.setValue((startTime.getMinute()<10)? "0" + Integer.toString(startTime.getMinute()): Integer.toString(startTime.getMinute()));
-        comboEndHour.setValue((endTime.getHour()<10)? "0" + Integer.toString(endTime.getHour()): Integer.toString(endTime.getHour()));
-        comboEndMinute.setValue((endTime.getMinute()<10)? "0" + Integer.toString(endTime.getMinute()): Integer.toString(endTime.getMinute()));
+        comboStartHour.setValue((startTime.getHour() < 10) ? "0" + Integer.toString(startTime.getHour()) : Integer.toString(startTime.getHour()));
+        comboStartMinute.setValue((startTime.getMinute() < 10) ? "0" + Integer.toString(startTime.getMinute()) : Integer.toString(startTime.getMinute()));
+        comboEndHour.setValue((endTime.getHour() < 10) ? "0" + Integer.toString(endTime.getHour()) : Integer.toString(endTime.getHour()));
+        comboEndMinute.setValue((endTime.getMinute() < 10) ? "0" + Integer.toString(endTime.getMinute()) : Integer.toString(endTime.getMinute()));
 
         //Appointment selection required to be modified or deleted
         Appointment modAppointment = tableCurrentSchedule.getSelectionModel().getSelectedItem();
-        
+
         // An appointment must be selected before it can be modified
         if (modAppointment == null) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -348,12 +352,11 @@ public class AppointmentManagerController {
 //        Timestamp startSQLts = Timestamp.valueOf(ldt);
 //        return startSQLts;
 //    }
-    
     //Convert to UTC
     public static Timestamp timeConversions(String catDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
         LocalDateTime ldt = LocalDateTime.parse(catDate, formatter);
-        
+
         ZoneId zid = ZoneId.systemDefault();
         ZonedDateTime zDateTime = ldt.atZone(zid).withZoneSameInstant(ZoneId.of("UTC"));
         ldt = zDateTime.toLocalDateTime();
@@ -361,7 +364,7 @@ public class AppointmentManagerController {
         String currentTime = zDateTime.format(formatter);
         return Timestamp.valueOf(ldt);
     }
-    
+
     //Convert to Local
     public static ZonedDateTime utcToLocal(Timestamp datetime) {
         ZoneId zid = ZoneId.systemDefault();
@@ -375,7 +378,7 @@ public class AppointmentManagerController {
 
     private void tableData(Boolean updateRefresh) throws SQLException, IOException {
         if (updateRefresh) {
-            setApptList(databaseAppointments());
+            apptList = databaseAppointments();
         }
         columnCustNameCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerName());
         columnCreatedByCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCreatedBy());
@@ -386,17 +389,86 @@ public class AppointmentManagerController {
         columnAppIdCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getAppointmentId());
         columnCusIdCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getCustomerId());
 
-        apptList = MainLandingController.getApptList();
         tableCurrentSchedule.setItems(apptList);
     }
-        
-        //Appointment Exception Checking
-//    private Boolean isValid(){
-//        String title;
-//        Customer customer;
-//        
-//        if(title == null || title.isEmpty()) {
-//            errorMessage += ("Title cannot be blank\n");
-//        }
-//    }
+
+    //Appointment Exception Checking
+    private Boolean isValid() {
+        String msg = "";
+        Boolean valid = false;
+        Boolean dateValid = false;
+        Boolean timeValid = false;
+
+        if (comboCustomerName.getSelectionModel().isEmpty()) {
+            msg += ("Customer Name requires input\n");
+        }
+
+        if (comboType.getSelectionModel().isEmpty()) {
+            msg += ("Type requires input\n");
+        }
+
+        if (txtCreatedBy.getText() == null || txtCreatedBy.getText().trim().isEmpty()) {
+            msg += ("Consultant requires input\n");
+        }
+
+        if (comboType.getSelectionModel().isEmpty()) {
+            msg += ("Type requires input\n");
+        }
+
+        if (datePicker.getValue() == null) {
+            msg += ("Date requires input\n");
+
+//            //Check for weekends
+//            if (datePicker.getValue().isBefore(LocalDate.now())) {
+//                msg += ("Date cannot be in the past\n");
+//            } else if (datePicker.getValue().getDayOfWeek().equals(datePicker.getValue().getDayOfWeek().SUNDAY)
+//                    || datePicker.getValue().getDayOfWeek().equals(datePicker.getValue().getDayOfWeek().SATURDAY)) {
+//                msg += ("Appointments must be scheduled during buisness hours\n");
+//            } else {
+//                dateValid = true;
+//            }
+        }
+
+//        if (timeValid) {
+//            //only allow appointments during business hours 9am-5pm
+//            if ((LocalTime.parse(startTime).getHour() < 9 || LocalTime.parse(startTime).getHour() >= 17)
+//                    || (LocalTime.parse(endTime).getHour() < 9 || LocalTime.parse(endTime).getHour() > 17)) {
+//                msg += ("Can only schedule appointments during business hours. (09:00 - 17:00)\n");
+//                timeValid = false;
+//            }
+            
+                
+//         LocalTime.parse(startTimeComboBox.getValue(), dtf).isAfter(LocalTime.parse(endTimeComboBox.getValue(), dtf))
+//         LocalTime.parse(startTimeComboBox.getValue(), dtf).equals(LocalTime.parse(endTimeComboBox.getValue(), dtf))) {
+
+            if (comboStartHour.getSelectionModel().isEmpty()) {
+                msg += ("Start Hour requires input\n");
+            }
+
+            if (comboStartMinute.getSelectionModel().isEmpty()) {
+                msg += ("Start Minute requires input\n");
+            }
+
+            if (comboEndHour.getSelectionModel().isEmpty()) {
+                msg += ("End Hour requires input\n");
+            }
+
+            if (comboEndMinute.getSelectionModel().isEmpty()) {
+                msg += ("End Minute requires input\n");
+            }
+
+            if (msg.length() > 0) {
+                msg += ("\nPlease fix the listed errors and save again");
+
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Error: Missing required data");
+                alert.setContentText(msg);
+                alert.showAndWait();
+            } else {
+                valid = true;
+            }
+            return valid;
+        }
+    
 }

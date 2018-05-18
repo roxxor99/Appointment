@@ -24,8 +24,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
-import static testrun.MainLandingController.getApptList;
+//import static testrun.MainLandingController.getApptList;
 import static testrun.SQLConnector.executeQuery;
+import static testrun.SQLConnectorData.databaseAppointments;
 
 /**
  * FXML Controller class
@@ -93,10 +94,10 @@ public class ReportLocationController implements Initializable {
     }
 
     @FXML
-    private void locationAction(ActionEvent event) {
+    private void locationAction(ActionEvent event) throws SQLException, IOException {
         String cmbLoc = comboLocation.getValue();
         
-        ObservableList<Appointment> locationList = getApptList();
+        ObservableList<Appointment> locationList = databaseAppointments();
         FilteredList<Appointment> filteredData = new FilteredList<>(locationList);
         filteredData.setPredicate(p -> p.getLocation().getValue().contains(cmbLoc));
         tableLocationReport.setItems(filteredData);

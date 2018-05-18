@@ -26,8 +26,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
-import static testrun.MainLandingController.getApptList;
+//import static testrun.MainLandingController.getApptList;
 import static testrun.SQLConnector.executeQuery;
+import static testrun.SQLConnectorData.databaseAppointments;
 
 /**
  * FXML Controller class
@@ -97,11 +98,11 @@ public class ReportConsultantController implements Initializable {
     }
 
     @FXML
-    private void consultantAction(ActionEvent event) throws SQLException {
+    private void consultantAction(ActionEvent event) throws SQLException, IOException {
 //        FilteredList<Appointment> aptFilList = new FilteredList<>();
         String cmbCon = comboConsultant.getValue();
         
-        ObservableList<Appointment> appointmentList = getApptList();
+        ObservableList<Appointment> appointmentList = databaseAppointments();
         FilteredList<Appointment> filteredData = new FilteredList<>(appointmentList);
         filteredData.setPredicate(p -> p.getCreatedBy().getValue().contains(cmbCon));
         tableConsultantReport.setItems(filteredData);
