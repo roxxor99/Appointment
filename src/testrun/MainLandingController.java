@@ -169,8 +169,9 @@ public class MainLandingController {
         LocalDateTime ldtPlusFifteenCurrent = now().plusMinutes(15);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
         String formattedDate = (ldtPlusFifteenCurrent).format(dtf);
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss.S");
-//        String tcformattedDate = sdf.format(AppointmentManagerController.timeConversions(formattedDate));
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss.S");
+        String tcformattedDate = sdf.format(AppointmentManagerController.timeConversions(formattedDate));
 
 //        String logCon = LoginController.getLoggedInUser();
 //        String appointmentAlert = "SELECT customer.customerName, appointment.title, appointment.start, appointment.end, appointment.lastUpdateBy "
@@ -179,26 +180,27 @@ public class MainLandingController {
 //                + "WHERE appointment.start <= " + "'" + tcformattedDate + "' "
 //                + "AND appointment.lastUpdateBy = " + "\"" + logCon + "\" "
 //                + "ORDER BY appointment.start DESC;";
-
+        
         String appointmentAlert = ("SELECT start, customerName  "
                 + "FROM appointment a, customer c "
                 + "WHERE c.customerId = a.customerId "
                 + "AND start BETWEEN now() AND date_add(now(), interval 15 minute) ");
 
-        
 //!!Need to convert rs.getString(1) to localtime currently displaying UTC (+6hrs)
         ResultSet rs = executeQuery(appointmentAlert);
         boolean hasAppt = false;
         StringBuffer sb = new StringBuffer("You have appointment(s) within 15 minutes: \n");
-        
+
         if (rs.next()) {
             hasAppt = true;
+            //(2) = customer name and (1) = date and time
             sb.append(rs.getString(2) + " at " + rs.getString(1) + "\n");
         }
         if (hasAppt) {
             Alert a = new Alert(Alert.AlertType.INFORMATION, sb.toString(), ButtonType.OK);
             a.showAndWait();
         }
+    }
 
 //        if (!rs.isBeforeFirst()) {
 //            String alertMSG = "";
@@ -220,8 +222,7 @@ public class MainLandingController {
 //            alert.setContentText(alertMSG);
 //            alert.showAndWait();
 //        }
-    }
-
+    
     private void tableData(Boolean updateRefresh) throws SQLException, IOException {
         if (updateRefresh) {
             apptList = databaseAppointments();

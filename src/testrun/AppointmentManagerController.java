@@ -5,12 +5,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -174,81 +177,85 @@ public class AppointmentManagerController {
 
     @FXML
     private void saveAction(ActionEvent event) throws SQLException, IOException {
-        //appointment exception
-//        if(!isValid()){
-//        return;    
-//        }
-
-        String[] parts = comboCustomerName.getSelectionModel().getSelectedItem().split(":");
-        String customerName = parts[0];
-        String customerId = parts[1];
-        Integer appointmentId = null;
-
-        String type = comboType.getSelectionModel().getSelectedItem();
-        String createdBy = txtCreatedBy.getText();
-        String location = comboLocation.getSelectionModel().getSelectedItem();
-        LocalDate date = datePicker.getValue();
-        String startHour = comboStartHour.getSelectionModel().getSelectedItem();
-        String startMinute = comboStartMinute.getSelectionModel().getSelectedItem();
-        String endHour = comboEndHour.getSelectionModel().getSelectedItem();
-        String endMinute = comboEndMinute.getSelectionModel().getSelectedItem();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedString = date.format(formatter);
-
-        Timestamp updateStartTime = timeConversions(formattedString + " " + startHour + ":" + startMinute + ":00.0");
-        Timestamp updateEndTime = timeConversions(formattedString + " " + endHour + ":" + endMinute + ":00.0");
-
         try {
-            Parent mainScreenParent = FXMLLoader.load(getClass().getResource("MainLanding.fxml"));
-            Scene mainScreenScene = new Scene(mainScreenParent);
-            Stage mainScreenStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            mainScreenStage.setScene(mainScreenScene);
-            mainScreenStage.show();
-
-            if (tableCurrentSchedule.getSelectionModel().isEmpty()) {
-                String sqlAppointmentInsert = "INSERT INTO appointment (customerId, title, description, location, contact, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy)"
-                        + "VALUES (?, ?, '', ?, '', '', ?, ?, now(), ?, now(), ?);";
-
-                PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAppointmentInsert);
-                statement.setString(1, customerId);
-                statement.setString(2, type);
-                statement.setString(3, location);
-                statement.setTimestamp(4, updateStartTime);
-                statement.setTimestamp(5, updateEndTime);
-                statement.setString(6, createdBy);
-                statement.setString(7, createdBy);
-
-                int rowsInserted = statement.executeUpdate();
-                if (rowsInserted > 0) {
-                    System.out.println("Appointment Saved.");
-                }
-            } else {
-                appointmentId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getAppointmentId().getValue();
-
-                String sqlAppointmentUpdate = "UPDATE appointment SET customerId=?, title =?, location =?, start =?, end =?, lastUpdate=now(), lastUpdateBy =?"
-                        + "WHERE appointmentId =?";
-                PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAppointmentUpdate);
-                statement.setString(1, customerId);
-                statement.setString(2, type);
-                statement.setString(3, location);
-                statement.setTimestamp(4, updateStartTime);
-                statement.setTimestamp(5, updateEndTime);
-                statement.setString(6, LoginController.getLoggedInUser());
-                statement.setInt(7, appointmentId);
-
-                int rowsInserted = statement.executeUpdate();
-                if (rowsInserted > 0) {
-                    System.out.println("Appointment Updated.");
-                }
+            //appointment exception
+            if (!isValid()) {
+                return;
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(AppointmentManagerController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+
+            String[] parts = comboCustomerName.getSelectionModel().getSelectedItem().split(":");
+            String customerName = parts[0];
+            String customerId = parts[1];
+            Integer appointmentId = null;
+
+            String type = comboType.getSelectionModel().getSelectedItem();
+            String createdBy = txtCreatedBy.getText();
+            String location = comboLocation.getSelectionModel().getSelectedItem();
+            LocalDate date = datePicker.getValue();
+            String startHour = comboStartHour.getSelectionModel().getSelectedItem();
+            String startMinute = comboStartMinute.getSelectionModel().getSelectedItem();
+            String endHour = comboEndHour.getSelectionModel().getSelectedItem();
+            String endMinute = comboEndMinute.getSelectionModel().getSelectedItem();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String formattedString = date.format(formatter);
+
+            Timestamp updateStartTime = timeConversions(formattedString + " " + startHour + ":" + startMinute + ":00.0");
+            Timestamp updateEndTime = timeConversions(formattedString + " " + endHour + ":" + endMinute + ":00.0");
+
+            try {
+                Parent mainScreenParent = FXMLLoader.load(getClass().getResource("MainLanding.fxml"));
+                Scene mainScreenScene = new Scene(mainScreenParent);
+                Stage mainScreenStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                mainScreenStage.setScene(mainScreenScene);
+                mainScreenStage.show();
+
+                if (tableCurrentSchedule.getSelectionModel().isEmpty()) {
+                    String sqlAppointmentInsert = "INSERT INTO appointment (customerId, title, description, location, contact, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy)"
+                            + "VALUES (?, ?, '', ?, '', '', ?, ?, now(), ?, now(), ?);";
+
+                    PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAppointmentInsert);
+                    statement.setString(1, customerId);
+                    statement.setString(2, type);
+                    statement.setString(3, location);
+                    statement.setTimestamp(4, updateStartTime);
+                    statement.setTimestamp(5, updateEndTime);
+                    statement.setString(6, createdBy);
+                    statement.setString(7, createdBy);
+
+                    int rowsInserted = statement.executeUpdate();
+                    if (rowsInserted > 0) {
+                        System.out.println("Appointment Saved.");
+                    }
+                } else {
+                    appointmentId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getAppointmentId().getValue();
+
+                    String sqlAppointmentUpdate = "UPDATE appointment SET customerId=?, title =?, location =?, start =?, end =?, lastUpdate=now(), lastUpdateBy =?"
+                            + "WHERE appointmentId =?";
+                    PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAppointmentUpdate);
+                    statement.setString(1, customerId);
+                    statement.setString(2, type);
+                    statement.setString(3, location);
+                    statement.setTimestamp(4, updateStartTime);
+                    statement.setTimestamp(5, updateEndTime);
+                    statement.setString(6, LoginController.getLoggedInUser());
+                    statement.setInt(7, appointmentId);
+
+                    int rowsInserted = statement.executeUpdate();
+                    if (rowsInserted > 0) {
+                        System.out.println("Appointment Updated.");
+                    }
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(AppointmentManagerController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(AppointmentManagerController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            //refreshes the table and DB data when true
+            tableData(false);
+        } catch (ParseException ex) {
             Logger.getLogger(AppointmentManagerController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //refreshes the table and DB data when true
-        tableData(false);
     }
 
     @FXML
@@ -339,19 +346,6 @@ public class AppointmentManagerController {
         }
     }
 
-    //FUN with timeconversion @ 2am!
-//    public static Timestamp dateFormatter(String catDate) {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
-//        LocalDateTime ldt = LocalDateTime.parse(catDate, formatter);
-//
-//        ZoneId zid = ZoneId.systemDefault();
-//        ZonedDateTime zDateTime = ldt.atZone(zid);
-//        ZonedDateTime utcStart = zDateTime.withZoneSameInstant(ZoneId.of("UTC"));
-//        ldt = utcStart.toLocalDateTime();
-//        //Create Timestamp values from Instants to update database
-//        Timestamp startSQLts = Timestamp.valueOf(ldt);
-//        return startSQLts;
-//    }
     //Convert to UTC
     public static Timestamp timeConversions(String catDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
@@ -376,6 +370,7 @@ public class AppointmentManagerController {
         return localStart;
     }
 
+    //refresh data
     private void tableData(Boolean updateRefresh) throws SQLException, IOException {
         if (updateRefresh) {
             apptList = databaseAppointments();
@@ -393,7 +388,7 @@ public class AppointmentManagerController {
     }
 
     //Appointment Exception Checking
-    private Boolean isValid() {
+    private Boolean isValid() throws ParseException, SQLException {
         String msg = "";
         Boolean valid = false;
         Boolean dateValid = false;
@@ -411,51 +406,119 @@ public class AppointmentManagerController {
             msg += ("Consultant requires input\n");
         }
 
-        if (comboType.getSelectionModel().isEmpty()) {
-            msg += ("Type requires input\n");
+        if (comboLocation.getSelectionModel().isEmpty()) {
+            msg += ("Location requires input\n");
         }
 
         if (datePicker.getValue() == null) {
             msg += ("Date requires input\n");
-
-//            //Check for weekends
-//            if (datePicker.getValue().isBefore(LocalDate.now())) {
-//                msg += ("Date cannot be in the past\n");
-//            } else if (datePicker.getValue().getDayOfWeek().equals(datePicker.getValue().getDayOfWeek().SUNDAY)
-//                    || datePicker.getValue().getDayOfWeek().equals(datePicker.getValue().getDayOfWeek().SATURDAY)) {
-//                msg += ("Appointments must be scheduled during buisness hours\n");
-//            } else {
-//                dateValid = true;
-//            }
+        } else {
+            //Verify that the date is not in the past or on the weekends
+            if (datePicker.getValue().isBefore(LocalDate.now())) {
+                msg += ("Date cannot be in the past\n");
+            } else if (datePicker.getValue().getDayOfWeek().equals(datePicker.getValue().getDayOfWeek().SUNDAY)
+                    || datePicker.getValue().getDayOfWeek().equals(datePicker.getValue().getDayOfWeek().SATURDAY)) {
+                msg += ("Appointments must be scheduled during buisness hours\nMon-Fri 09:00 - 17:00\n ");
+            } else {
+                dateValid = true;
+            }
         }
 
-//        if (timeValid) {
-//            //only allow appointments during business hours 9am-5pm
-//            if ((LocalTime.parse(startTime).getHour() < 9 || LocalTime.parse(startTime).getHour() >= 17)
-//                    || (LocalTime.parse(endTime).getHour() < 9 || LocalTime.parse(endTime).getHour() > 17)) {
-//                msg += ("Can only schedule appointments during business hours. (09:00 - 17:00)\n");
-//                timeValid = false;
+//WORKS BUT CRASHES IF THE HOUR OR MINUTE CONTROLS ARE LEFT BLANK
+        //Check to see if the Start time is before the End time
+        String startHour = comboStartHour.getSelectionModel().getSelectedItem();
+        String startMinute = comboStartMinute.getSelectionModel().getSelectedItem();
+        String endHour = comboEndHour.getSelectionModel().getSelectedItem();
+        String endMinute = comboEndMinute.getSelectionModel().getSelectedItem();
+
+//        if (startHour == null || startHour.isEmpty()) {
+        if (comboStartHour.getSelectionModel() == null || comboStartHour.getSelectionModel().isEmpty()) {
+            msg += ("Start Hour requires input\n");
+        }
+
+//        if (startMinute == null || startMinute.isEmpty()) {
+        if (comboStartMinute.getSelectionModel() == null || comboStartMinute.getSelectionModel().isEmpty()) {
+            msg += ("Start Minute requires input\n");
+        }
+
+//        if (endHour == null || endHour.isEmpty()) {
+        if (comboEndHour.getSelectionModel() == null || comboEndHour.getSelectionModel().isEmpty()) {
+            msg += ("End Hour requires input\n");
+        }
+
+//        if (endMinute == null || endMinute.isEmpty()) {
+        if (comboEndMinute.getSelectionModel() == null || comboEndMinute.getSelectionModel().isEmpty()) {
+            msg += ("End Minute requires input\n");
+        }
+
+        //Concat Hour + Minute
+        String builtStartTime = startHour + ":" + startMinute + ":00.0";
+        String builtEndTime = endHour + ":" + endMinute + ":00.0";
+
+//        if (builtStartTime == null || builtStartTime.isEmpty()) {
+//            msg += ("Starting hour and minute require input\n");
+//        }
+//
+//        if (builtEndTime == null || builtEndTime.isEmpty()) {
+//            msg += ("Ending hour and minute require input\n");
+//        }
+
+        //Convert String builtStartTime into type Date
+        SimpleDateFormat sdfStartTime = new SimpleDateFormat("kk:mm:ss.S");
+        Date updateStartTime = sdfStartTime.parse(builtStartTime);
+
+        //Convert String builtEndTime into type Date
+        SimpleDateFormat sdfEndTime = new SimpleDateFormat("kk:mm:ss.S");
+        Date updateEndTime = sdfEndTime.parse(builtEndTime);
+
+        if (!builtStartTime.isEmpty() && !builtEndTime.isEmpty()) {
+//                if (!comboStartHour.getSelectionModel().isEmpty() && !comboEndHour.getSelectionModel().isEmpty()) {
+            if (updateStartTime.after(updateEndTime)) {
+                msg += ("The Start time must be before the End time\n");
+            } else {
+                timeValid = true;
+            }
+        }
+        
+//        //Check for overlapping appointments  
+////        if (timeValid == true && dateValid == true) {
+//
+//            String startPending = startHour + ":" + startMinute + ":00.0";
+//            String endPending = endHour + ":" + endMinute + ":00.0";
+//
+//            //Pending appointments formatted and converted to LocalDateTime
+//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
+//            LocalDateTime ldtStartPending = LocalDateTime.parse(startPending, formatter);
+//            LocalDateTime ldtEndPending = LocalDateTime.parse(endPending, formatter);
+//
+//            PreparedStatement statement = SQLConnector.getCon().prepareStatement(
+//                    "SELECT start, end FROM appointment "
+//                    + "WHERE createdBy = 'test'");
+//
+//            ResultSet rs = statement.executeQuery();
+//            while (rs.next()) {
+//                //Actual appointments -> start and end converted to LocalDateTime
+//                LocalDateTime ldtStartExisting = rs.getTimestamp("start").toLocalDateTime();
+//                LocalDateTime ldtEndExisting = rs.getTimestamp("end").toLocalDateTime();
+
+
+//            //? I think this is right->  (>) = .isAfter and (<) = .isBefore
+
+//           //Check the following 3 cases
+////           tStartA < tStartB && tStartB < tEndA //For case 1
+////           OR
+////           tStartA < tEndB && tEndB <= tEndA //For case 2
+////           OR
+////           tStartB < tStartA  && tEndB > tEndA //For case 3
+
+////           ldtStartPending < ldtStartExisting && ldtStartExisting < ldtEndPending //For case 1
+////           OR
+////           ldtStartPending < ldtEndExisting && ldtEndExisting <= ldtEndPending //For case 2
+////           OR
+////           ldtStartExisting < ldtStartPending  && ldtEndExisting > ldtEndPending //For case 3
+//
+//
 //            }
-            
-                
-//         LocalTime.parse(startTimeComboBox.getValue(), dtf).isAfter(LocalTime.parse(endTimeComboBox.getValue(), dtf))
-//         LocalTime.parse(startTimeComboBox.getValue(), dtf).equals(LocalTime.parse(endTimeComboBox.getValue(), dtf))) {
-
-            if (comboStartHour.getSelectionModel().isEmpty()) {
-                msg += ("Start Hour requires input\n");
-            }
-
-            if (comboStartMinute.getSelectionModel().isEmpty()) {
-                msg += ("Start Minute requires input\n");
-            }
-
-            if (comboEndHour.getSelectionModel().isEmpty()) {
-                msg += ("End Hour requires input\n");
-            }
-
-            if (comboEndMinute.getSelectionModel().isEmpty()) {
-                msg += ("End Minute requires input\n");
-            }
 
             if (msg.length() > 0) {
                 msg += ("\nPlease fix the listed errors and save again");
@@ -470,5 +533,6 @@ public class AppointmentManagerController {
             }
             return valid;
         }
-    
-}
+        
+    }
+

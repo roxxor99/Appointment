@@ -242,7 +242,13 @@ public class CustomerManagerController {
 //        comboCountry.setValue(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCountry().getValue());
         comboCountry.setValue(catCountry);
         
-        comboCity.setValue(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCity().getValue());
+        //Need to set city AND id
+        String tmpCity = tableCurrentSchedule.getSelectionModel().getSelectedItem().getCity().getValue();
+        String tmpCityId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getCityId().getValue();
+        String catCity = tmpCity + ":" + tmpCityId;
+//        comboCity.setValue(tableCurrentSchedule.getSelectionModel().getSelectedItem().getCity().getValue());
+        comboCity.setValue(catCity);
+        
         txtZip.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getPostalCode().getValue());
         txtPhone.setText(tableCurrentSchedule.getSelectionModel().getSelectedItem().getPhone().getValue());
     }
