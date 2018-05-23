@@ -186,14 +186,13 @@ public class MainLandingController {
                 + "WHERE c.customerId = a.customerId "
                 + "AND start BETWEEN now() AND date_add(now(), interval 15 minute) ");
 
-//!!Need to convert rs.getString(1) to localtime currently displaying UTC (+6hrs)
         ResultSet rs = executeQuery(appointmentAlert);
         boolean hasAppt = false;
         StringBuffer sb = new StringBuffer("You have appointment(s) within 15 minutes: \n");
 
         if (rs.next()) {
             hasAppt = true;
-            //(2) = customer name and (1) = date and time
+            //(2) = customer name and (1) = date and time utcToLocal
             sb.append(rs.getString(2) + " at " + rs.getString(1) + "\n");
         }
         if (hasAppt) {

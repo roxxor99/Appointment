@@ -360,14 +360,14 @@ public class AppointmentManagerController {
     }
 
     //Convert to Local
-    public static ZonedDateTime utcToLocal(Timestamp datetime) {
+    public static LocalDateTime utcToLocal(LocalDateTime datetime) {
         ZoneId zid = ZoneId.systemDefault();
-        ZonedDateTime zDateTime = datetime.toLocalDateTime().atZone(ZoneId.of("UTC"));
+        ZonedDateTime zDateTime = datetime.atZone(ZoneId.of("UTC"));
         ZonedDateTime localStart = zDateTime.withZoneSameInstant(zid);
 
         System.out.println("From db in UTC: " + zDateTime);
         System.out.println("From db in local time: " + localStart);
-        return localStart;
+        return localStart.toLocalDateTime();
     }
 
     //refresh data
@@ -431,37 +431,49 @@ public class AppointmentManagerController {
         String endHour = comboEndHour.getSelectionModel().getSelectedItem();
         String endMinute = comboEndMinute.getSelectionModel().getSelectedItem();
 
-//        if (startHour == null || startHour.isEmpty()) {
-        if (comboStartHour.getSelectionModel() == null || comboStartHour.getSelectionModel().isEmpty()) {
+        if (startHour == null || startHour.isEmpty()) {
             msg += ("Start Hour requires input\n");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error: Missing required data");
+            alert.setContentText(msg);
+            alert.showAndWait();
+            return (false);
         }
 
-//        if (startMinute == null || startMinute.isEmpty()) {
-        if (comboStartMinute.getSelectionModel() == null || comboStartMinute.getSelectionModel().isEmpty()) {
+        if (startMinute == null || startMinute.isEmpty()) {
             msg += ("Start Minute requires input\n");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error: Missing required data");
+            alert.setContentText(msg);
+            alert.showAndWait();
+            return (false);
         }
 
-//        if (endHour == null || endHour.isEmpty()) {
-        if (comboEndHour.getSelectionModel() == null || comboEndHour.getSelectionModel().isEmpty()) {
+        if (endHour == null || endHour.isEmpty()) {
             msg += ("End Hour requires input\n");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error: Missing required data");
+            alert.setContentText(msg);
+            alert.showAndWait();
+            return (false);
         }
 
-//        if (endMinute == null || endMinute.isEmpty()) {
-        if (comboEndMinute.getSelectionModel() == null || comboEndMinute.getSelectionModel().isEmpty()) {
+        if (endMinute == null || endMinute.isEmpty()) {
             msg += ("End Minute requires input\n");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error: Missing required data");
+            alert.setContentText(msg);
+            alert.showAndWait();
+            return (false);
         }
 
         //Concat Hour + Minute
         String builtStartTime = startHour + ":" + startMinute + ":00.0";
         String builtEndTime = endHour + ":" + endMinute + ":00.0";
-
-//        if (builtStartTime == null || builtStartTime.isEmpty()) {
-//            msg += ("Starting hour and minute require input\n");
-//        }
-//
-//        if (builtEndTime == null || builtEndTime.isEmpty()) {
-//            msg += ("Ending hour and minute require input\n");
-//        }
 
         //Convert String builtStartTime into type Date
         SimpleDateFormat sdfStartTime = new SimpleDateFormat("kk:mm:ss.S");
@@ -479,60 +491,90 @@ public class AppointmentManagerController {
                 timeValid = true;
             }
         }
-        
-//        //Check for overlapping appointments  
-////        if (timeValid == true && dateValid == true) {
-//
-//            String startPending = startHour + ":" + startMinute + ":00.0";
-//            String endPending = endHour + ":" + endMinute + ":00.0";
-//
-//            //Pending appointments formatted and converted to LocalDateTime
-//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
-//            LocalDateTime ldtStartPending = LocalDateTime.parse(startPending, formatter);
-//            LocalDateTime ldtEndPending = LocalDateTime.parse(endPending, formatter);
-//
-//            PreparedStatement statement = SQLConnector.getCon().prepareStatement(
-//                    "SELECT start, end FROM appointment "
-//                    + "WHERE createdBy = 'test'");
-//
-//            ResultSet rs = statement.executeQuery();
-//            while (rs.next()) {
-//                //Actual appointments -> start and end converted to LocalDateTime
-//                LocalDateTime ldtStartExisting = rs.getTimestamp("start").toLocalDateTime();
-//                LocalDateTime ldtEndExisting = rs.getTimestamp("end").toLocalDateTime();
 
+        //Check for overlapping appointments  
+        if (timeValid == true && dateValid == true) {
 
-//            //? I think this is right->  (>) = .isAfter and (<) = .isBefore
+            String startPending = datePicker.getValue() + " " + startHour + ":" + startMinute + ":00.0";
+            String endPending = datePicker.getValue() + " " + endHour + ":" + endMinute + ":00.0";
 
-//           //Check the following 3 cases
-////           tStartA < tStartB && tStartB < tEndA //For case 1
-////           OR
-////           tStartA < tEndB && tEndB <= tEndA //For case 2
-////           OR
-////           tStartB < tStartA  && tEndB > tEndA //For case 3
+            //Pending appointments formatted and converted to LocalDateTime
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss.S");
+            LocalDateTime ldtStartPending = LocalDateTime.parse(startPending, formatter);
+            LocalDateTime ldtEndPending = LocalDateTime.parse(endPending, formatter);
 
-////           ldtStartPending < ldtStartExisting && ldtStartExisting < ldtEndPending //For case 1
-////           OR
-////           ldtStartPending < ldtEndExisting && ldtEndExisting <= ldtEndPending //For case 2
-////           OR
-////           ldtStartExisting < ldtStartPending  && ldtEndExisting > ldtEndPending //For case 3
-//
-//
-//            }
+            PreparedStatement statement = SQLConnector.getCon().prepareStatement(
+                    "SELECT start, end FROM appointment "
+                    + "WHERE createdBy = 'test'");
 
-            if (msg.length() > 0) {
-                msg += ("\nPlease fix the listed errors and save again");
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                //Actual appointments -> start and end converted to LocalDateTime
+                LocalDateTime ldtStartExisting = utcToLocal(rs.getTimestamp("start").toLocalDateTime());
+                LocalDateTime ldtEndExisting = utcToLocal(rs.getTimestamp("end").toLocalDateTime());
 
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Error: Missing required data");
-                alert.setContentText(msg);
-                alert.showAndWait();
-            } else {
-                valid = true;
+                //Case 1: If a pending appointment starts in the middle of an existing appointment.
+//                if (ldtStartPending < ldtStartExisting && ldtStartExisting < ldtEndPending) {
+                if (ldtStartPending.isBefore(ldtStartExisting) && ldtStartExisting.isBefore(ldtEndPending)) {
+                    msg += ("Cannot create a new appointment that runs over into an existing one.\n");
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error: Missing required data");
+                    alert.setContentText(msg);
+                    alert.showAndWait();
+                    return (false);
+                }
+
+                //Case 2: If a pending appointment runs over into an existing appointment.
+//                if (ldtStartPending < ldtEndExisting && ldtEndExisting <= ldtEndPending) {
+                if (ldtStartPending.isBefore(ldtEndExisting) && ldtEndExisting.isBefore(ldtEndPending)) {
+                    msg += ("Cannot create a new appointment that starts in the middle of an existing one.\n");
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error: Missing required data");
+                    alert.setContentText(msg);
+                    alert.showAndWait();
+                    return (false);
+                }
+
+                //Case 3: If a pending appointment's start AND end time fall into the middle of an existing appointment.
+//                if (ldtStartExisting < ldtStartPending && ldtEndExisting > ldtEndPending) {
+                if (ldtStartExisting.isBefore(ldtStartPending) && ldtEndExisting.isAfter(ldtEndPending)) {
+                    msg += ("Cannot create a new appointment that starts and ends in the middle of an existing one.\n");
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error: Missing required data");
+                    alert.setContentText(msg);
+                    alert.showAndWait();
+                    return (false);
+                }
             }
-            return valid;
         }
-        
+
+        //?  (>) = .isAfter and (<) = .isBefore
+        //Check the following 3 cases
+//           tStartA < tStartB && tStartB < tEndA //For case 1
+//           OR
+//           tStartA < tEndB && tEndB <= tEndA //For case 2
+//           OR
+//           tStartB < tStartA  && tEndB > tEndA //For case 3
+//           ldtStartPending < ldtStartExisting && ldtStartExisting < ldtEndPending //For case 1
+//           OR
+//           ldtStartPending < ldtEndExisting && ldtEndExisting <= ldtEndPending //For case 2
+//           OR
+//           ldtStartExisting < ldtStartPending  && ldtEndExisting > ldtEndPending //For case 3
+        if (msg.length() > 0) {
+            msg += ("\nPlease fix the listed errors and save again");
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error: Missing required data");
+            alert.setContentText(msg);
+            alert.showAndWait();
+        } else {
+            valid = true;
+        }
+        return valid;
     }
 
+}
