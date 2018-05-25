@@ -172,14 +172,6 @@ public class MainLandingController {
         
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss.S");
         String tcformattedDate = sdf.format(AppointmentManagerController.timeConversions(formattedDate));
-
-//        String logCon = LoginController.getLoggedInUser();
-//        String appointmentAlert = "SELECT customer.customerName, appointment.title, appointment.start, appointment.end, appointment.lastUpdateBy "
-//                + "FROM appointment "
-//                + "INNER JOIN customer ON appointment.customerid=customer.customerId "
-//                + "WHERE appointment.start <= " + "'" + tcformattedDate + "' "
-//                + "AND appointment.lastUpdateBy = " + "\"" + logCon + "\" "
-//                + "ORDER BY appointment.start DESC;";
         
         String appointmentAlert = ("SELECT start, customerName  "
                 + "FROM appointment a, customer c "
@@ -189,11 +181,15 @@ public class MainLandingController {
         ResultSet rs = executeQuery(appointmentAlert);
         boolean hasAppt = false;
         StringBuffer sb = new StringBuffer("You have appointment(s) within 15 minutes: \n");
-
+        
+        
+        
         if (rs.next()) {
             hasAppt = true;
             //(2) = customer name and (1) = date and time utcToLocal
-            sb.append(rs.getString(2) + " at " + rs.getString(1) + "\n");
+            LocalDateTime ldt = LocalDateTime.parse(rs.getString(1), dtf);
+            
+            sb.append(rs.getString(2) + " at " + AppointmentManagerController.utcToLocal(ldt) + "\n");
         }
         if (hasAppt) {
             Alert a = new Alert(Alert.AlertType.INFORMATION, sb.toString(), ButtonType.OK);
@@ -201,27 +197,6 @@ public class MainLandingController {
         }
     }
 
-//        if (!rs.isBeforeFirst()) {
-//            String alertMSG = "";
-//            alertMSG += ("You have appointments that are about to begin");
-//            while (rs.next()) {
-//                alertMSG += ("\n\n");
-//                ZonedDateTime zoneStart = AppointmentManagerController.utcToLocal(rs.getTimestamp("theStartTime"));
-//                ZonedDateTime zoneEnd = AppointmentManagerController.utcToLocal(rs.getTimestamp("theEndTime"));
-//
-//                //Information to supply the alert Type- Time- Customer
-//                alertMSG += (rs.getString("title") + "\n");
-//                alertMSG += (rs.getString("customerName") + "\n");
-//                alertMSG += ("From " + zoneStart.toLocalTime().toString() + " to " + zoneEnd.toLocalTime().toString() + "\n");
-//                alertMSG += ("With " + rs.getString("customerName"));
-//            }
-//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//            alert.setTitle("Alert");
-//            alert.setHeaderText("Upcoming Appointment");
-//            alert.setContentText(alertMSG);
-//            alert.showAndWait();
-//        }
-    
     private void tableData(Boolean updateRefresh) throws SQLException, IOException {
         if (updateRefresh) {
             apptList = databaseAppointments();
@@ -232,7 +207,8 @@ public class MainLandingController {
         columnLocationCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getLocation());
         columnStartCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getStartTime());
         columnEndCurrentSchedule.setCellValueFactory(cellData -> cellData.getValue().getEndTime());
-
+        
+//        tableMainCurrentSchedule.refresh();
         tableMainCurrentSchedule.setItems(apptList);
     }
 }

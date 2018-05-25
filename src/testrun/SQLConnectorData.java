@@ -51,7 +51,10 @@ public class SQLConnectorData extends SQLConnector {
             Customer customer = new Customer();
             customer.setCustomerId(queryResult.getString("customerid"));
             customer.setCustomerName(queryResult.getString("customerName"));
+            System.out.println(queryResult.getString("customerName"));
+            
             customer.setAddressId(queryResult.getString("addressId"));
+            System.out.println(queryResult.getString("addressId"));
             customer.setAddress(queryResult.getString("address"));
             customer.setCountryId(queryResult.getString("countryId"));
             customer.setCountry(queryResult.getString("country"));

@@ -182,6 +182,7 @@ public class AppointmentManagerController {
             if (!isValid()) {
                 return;
             }
+            
 
             String[] parts = comboCustomerName.getSelectionModel().getSelectedItem().split(":");
             String customerName = parts[0];
@@ -230,7 +231,7 @@ public class AppointmentManagerController {
                 } else {
                     appointmentId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getAppointmentId().getValue();
 
-                    String sqlAppointmentUpdate = "UPDATE appointment SET customerId=?, title =?, location =?, start =?, end =?, lastUpdate=now(), lastUpdateBy =?"
+                    String sqlAppointmentUpdate = "UPDATE appointment SET customerId=?, title =?, location =?, start =?, end =?, lastUpdate=now(), lastUpdateBy =?, createdBy=?"
                             + "WHERE appointmentId =?";
                     PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAppointmentUpdate);
                     statement.setString(1, customerId);
@@ -239,7 +240,8 @@ public class AppointmentManagerController {
                     statement.setTimestamp(4, updateStartTime);
                     statement.setTimestamp(5, updateEndTime);
                     statement.setString(6, LoginController.getLoggedInUser());
-                    statement.setInt(7, appointmentId);
+                    statement.setString(7, createdBy);
+                    statement.setInt(8, appointmentId);
 
                     int rowsInserted = statement.executeUpdate();
                     if (rowsInserted > 0) {
@@ -424,7 +426,6 @@ public class AppointmentManagerController {
             }
         }
 
-//WORKS BUT CRASHES IF THE HOUR OR MINUTE CONTROLS ARE LEFT BLANK
         //Check to see if the Start time is before the End time
         String startHour = comboStartHour.getSelectionModel().getSelectedItem();
         String startMinute = comboStartMinute.getSelectionModel().getSelectedItem();
@@ -484,7 +485,6 @@ public class AppointmentManagerController {
         Date updateEndTime = sdfEndTime.parse(builtEndTime);
 
         if (!builtStartTime.isEmpty() && !builtEndTime.isEmpty()) {
-//                if (!comboStartHour.getSelectionModel().isEmpty() && !comboEndHour.getSelectionModel().isEmpty()) {
             if (updateStartTime.after(updateEndTime)) {
                 msg += ("The Start time must be before the End time\n");
             } else {
@@ -513,8 +513,7 @@ public class AppointmentManagerController {
                 LocalDateTime ldtStartExisting = utcToLocal(rs.getTimestamp("start").toLocalDateTime());
                 LocalDateTime ldtEndExisting = utcToLocal(rs.getTimestamp("end").toLocalDateTime());
 
-                //Case 1: If a pending appointment starts in the middle of an existing appointment.
-//                if (ldtStartPending < ldtStartExisting && ldtStartExisting < ldtEndPending) {
+                //Case 1: If a pending appointment runs over into an existing appointment.
                 if (ldtStartPending.isBefore(ldtStartExisting) && ldtStartExisting.isBefore(ldtEndPending)) {
                     msg += ("Cannot create a new appointment that runs over into an existing one.\n");
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -525,8 +524,7 @@ public class AppointmentManagerController {
                     return (false);
                 }
 
-                //Case 2: If a pending appointment runs over into an existing appointment.
-//                if (ldtStartPending < ldtEndExisting && ldtEndExisting <= ldtEndPending) {
+                //Case 2: If a pending appointment starts in the middle of an existing appointment.
                 if (ldtStartPending.isBefore(ldtEndExisting) && ldtEndExisting.isBefore(ldtEndPending)) {
                     msg += ("Cannot create a new appointment that starts in the middle of an existing one.\n");
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -538,7 +536,6 @@ public class AppointmentManagerController {
                 }
 
                 //Case 3: If a pending appointment's start AND end time fall into the middle of an existing appointment.
-//                if (ldtStartExisting < ldtStartPending && ldtEndExisting > ldtEndPending) {
                 if (ldtStartExisting.isBefore(ldtStartPending) && ldtEndExisting.isAfter(ldtEndPending)) {
                     msg += ("Cannot create a new appointment that starts and ends in the middle of an existing one.\n");
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -551,18 +548,6 @@ public class AppointmentManagerController {
             }
         }
 
-        //?  (>) = .isAfter and (<) = .isBefore
-        //Check the following 3 cases
-//           tStartA < tStartB && tStartB < tEndA //For case 1
-//           OR
-//           tStartA < tEndB && tEndB <= tEndA //For case 2
-//           OR
-//           tStartB < tStartA  && tEndB > tEndA //For case 3
-//           ldtStartPending < ldtStartExisting && ldtStartExisting < ldtEndPending //For case 1
-//           OR
-//           ldtStartPending < ldtEndExisting && ldtEndExisting <= ldtEndPending //For case 2
-//           OR
-//           ldtStartExisting < ldtStartPending  && ldtEndExisting > ldtEndPending //For case 3
         if (msg.length() > 0) {
             msg += ("\nPlease fix the listed errors and save again");
 

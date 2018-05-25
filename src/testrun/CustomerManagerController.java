@@ -150,7 +150,8 @@ public class CustomerManagerController {
                 }
             } else {
                 String customerId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getCustomerId().getValue();
-
+                String addressId = tableCurrentSchedule.getSelectionModel().getSelectedItem().getAddressId().getValue();
+                
                 String sqlAddressUpdate = "UPDATE address SET address=?, cityId=?, postalCode=?, phone=?, lastUpdate=now(), lastUpdateBy=?"
                         + "WHERE addressId =?";
                 PreparedStatement statement = SQLConnector.getCon().prepareStatement(sqlAddressUpdate);
@@ -159,7 +160,12 @@ public class CustomerManagerController {
                 statement.setString(3, postalCode);
                 statement.setString(4, phone);
                 statement.setString(5, LoginController.getLoggedInUser());
-
+                statement.setString(6, addressId);
+                int rowsInserted = statement.executeUpdate();
+                if (rowsInserted > 0) {
+                    System.out.println("Address Updated.");
+                }
+                
                 String sqlCustomerUpdate = "UPDATE customer SET customerName=?, lastUpdate=now(), lastUpdateBy=?"
                         + "WHERE customerId =?";
                 statement = SQLConnector.getCon().prepareStatement(sqlCustomerUpdate);
@@ -168,7 +174,7 @@ public class CustomerManagerController {
                 statement.setString(3, customerId);
 
                 //Use executeUpdate(INSERT/MOD/DELETE) instead of executeQuery(Query the data)
-                int rowsInserted = statement.executeUpdate();
+                rowsInserted = statement.executeUpdate();
                 if (rowsInserted > 0) {
                     System.out.println("Customer Updated.");
                 }
